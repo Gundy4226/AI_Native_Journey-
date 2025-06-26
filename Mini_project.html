@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Affirmation Generator (Calming Tone)</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for overall theme and specific elements not covered by Tailwind */
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #F5F8FA; /* Very light blue-grey for calming background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #4A5568; /* Softer dark grey-blue text for readability on light background */
+            padding: 20px; /* Add some padding for smaller screens */
+        }
+        .main-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem; /* Space between card and history */
+            width: 95%;
+            max-width: 900px; /* Max width for wider layouts */
+        }
+        .card-container {
+            background-color: #FFFFFF; /* Pure white for clean, airy feel */
+            border-radius: 1rem; /* Large rounded corners */
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Softer shadow */
+            text-align: center;
+            flex-shrink: 0; /* Don't shrink when history grows */
+            border: 1px solid #E2E8F0; /* Subtle light border */
+        }
+        .input-field {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1.5rem; /* More space below */
+            border: 1px solid #CBD5E1; /* Lighter border */
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            color: #2D3748; /* Darker text for input */
+            background-color: #F8FAFC; /* Very light input background */
+            box-sizing: border-box;
+            -webkit-appearance: none; /* Remove default browser styling for select */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292%22%20height%3D%22292%22%3E%3Cpath%20fill%3D%22%23718096%22%20d%3D%22M287%2C193.999L146%2C52.999L5%2C193.999c-3%2C3-5%2C5-5%2C5s2%2C2%2C5%2C5l129%2C130c3%2C3%2C5%2C5%2C5%2C5s2%2C-2%2C5%2C-5l129%2C-130c3%2C-3%2C5%2C-5%2C5%2C-5S290%2C196.999%2C287%2C193.999z%22%2F%3E%3C%2Fsvg%3E'); /* Custom dropdown arrow - darker for contrast */
+            background-repeat: no-repeat;
+            background-position: right 0.7em top 50%, 0 0;
+            background-size: 0.65em auto, 100%;
+            padding-right: 2.5rem; /* Space for custom arrow */
+        }
+        .input-field::placeholder {
+            color: #A0AEC0; /* Muted placeholder text */
+        }
+        .button-group {
+            display: flex;
+            gap: 1rem; /* Space between buttons */
+            justify-content: center;
+            flex-wrap: wrap; /* Allow buttons to wrap on small screens */
+            margin-top: 1rem; /* Space below affirmation */
+        }
+        .button-style {
+            background-color: #38B2AC; /* Calming Teal primary color */
+            color: white;
+            padding: 0.75rem 1.5rem; /* Slightly less horizontal padding for group */
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            flex-grow: 1; /* Allow buttons to grow */
+            min-width: 120px; /* Minimum width for buttons */
+        }
+        .button-style:hover {
+            background-color: #4FD1C5; /* Lighter teal on hover */
+            transform: translateY(-1px); /* Slight lift effect */
+        }
+        /* Specific button colors for action buttons (calming palette) */
+        .button-style.green {
+            background-color: #10B981; /* Emerald Green */
+        }
+        .button-style.green:hover {
+            background-color: #059669;
+        }
+        .button-style.red {
+            background-color: #EF4444; /* Muted Red */
+        }
+        .button-style.red:hover {
+            background-color: #DC2626;
+        }
+        .button-style.orange {
+            background-color: #F59E0B; /* Amber Orange */
+        }
+        .button-style.orange:hover {
+            background-color: #D97706;
+        }
+        .affirmation-output {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #D1FAE5; /* Default very light green for general */
+            border-radius: 0.75rem;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #065F46; /* Dark green text for general */
+            font-size: 1.3rem;
+            font-weight: 700;
+            font-style: italic;
+            text-shadow: none; /* Removed harsh text shadow */
+            border: 2px solid #A7F3D0; /* Lighter border for general */
+            transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease; /* Smooth color transition */
+        }
+        .emoji {
+            font-size: 1.5em; /* Larger emoji */
+            margin-right: 10px; /* Space between emoji and text */
+        }
+
+        /* History and Favorites Section */
+        .history-container {
+            background-color: #FFFFFF; /* Pure white */
+            border-radius: 1rem;
+            padding: 2.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #E2E8F0;
+        }
+        .history-list, .favorites-list {
+            list-style: none;
+            padding: 0;
+            max-height: 200px; /* Limit height for scrolling */
+            overflow-y: auto; /* Enable scrolling */
+            border: 1px solid #CBD5E1; /* Lighter border */
+            border-radius: 0.5rem;
+            padding: 10px;
+            background-color: #F8FAFC; /* Very light background for lists */
+        }
+        .history-list li, .favorites-list li {
+            padding: 8px 10px;
+            border-bottom: 1px solid #E2E8F0; /* Lighter divider */
+            font-size: 0.95rem;
+            text-align: left;
+            word-wrap: break-word; /* Ensure long affirmations wrap */
+            color: #4A5568; /* Darker text for list items */
+        }
+        .history-list li:last-child, .favorites-list li:last-child {
+            border-bottom: none;
+        }
+        .history-list li .date, .favorites-list li .date {
+            font-size: 0.8em;
+            color: #718096; /* Muted date color */
+            display: block;
+            margin-top: 4px;
+        }
+        .favorites-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .favorites-list li .remove-fav-btn {
+            background: none;
+            border: none;
+            color: #EF4444; /* Muted Red for delete */
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+            transition: color 0.2s ease;
+        }
+        .favorites-list li .remove-fav-btn:hover {
+            color: #DC2626;
+        }
+        .history-image {
+            margin-top: 2rem; /* Space above the image */
+            max-width: 100%; /* Ensure image fits container */
+            height: auto;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+        }
+
+
+        /* Mobile responsiveness adjustments */
+        @media (min-width: 768px) {
+            .main-container {
+                flex-direction: row; /* Side-by-side on larger screens */
+                justify-content: center;
+            }
+            .card-container {
+                flex: 1; /* Take equal width */
+            }
+            .history-container {
+                flex: 1; /* Take equal width */
+            }
+        }
+        @media (max-width: 640px) {
+            .card-container, .history-container {
+                padding: 1.5rem;
+                margin: 0; /* Remove side margins on very small screens */
+            }
+            .text-3xl {
+                font-size: 2rem;
+            }
+            .affirmation-output {
+                font-size: 1rem;
+                padding: 1rem;
+            }
+            .button-style {
+                font-size: 0.9rem;
+                padding: 0.75rem 1rem;
+            }
+            .button-group {
+                flex-direction: column; /* Stack buttons vertically */
+            }
+        }
+
+        /* --- Modal Styles --- */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it's on top of everything */
+            opacity: 0; /* Start hidden for fade-in */
+            visibility: hidden; /* Also hidden for accessibility */
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background-color: #FFFFFF; /* White modal background */
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 450px; /* Limit modal width */
+            width: 90%;
+            position: relative;
+            transform: translateY(20px); /* Start slightly below for slide-up effect */
+            transition: transform 0.3s ease-in-out;
+        }
+        .modal-overlay.show .modal-content {
+            transform: translateY(0);
+        }
+        .modal-content h2 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #0D9488; /* Teal color for modal title */
+            margin-bottom: 1.5rem;
+        }
+        .modal-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem; /* Rounded corners for image */
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow for image */
+        }
+        .modal-content p {
+            font-size: 1.1rem;
+            color: #4A5568;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+        .modal-close-btn {
+            background-color: #EF4444; /* Muted Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            border: none;
+            transition: background-color 0.2s ease-in-out;
+        }
+        .modal-close-btn:hover {
+            background-color: #DC2626;
+        }
+
+        /* Styles for the custom message box */
+        .custom-message-box {
+            position: fixed; /* Stays in place relative to the viewport */
+            bottom: 20px; /* Distance from the bottom of the screen */
+            left: 20px; /* Distance from the left of the screen */
+            transform: translateX(0); /* No horizontal centering needed */
+            background-color: rgba(0, 0, 0, 0.75); /* Semi-transparent dark background */
+            color: white; /* White text color */
+            padding: 12px 25px; /* Padding inside the box */
+            border-radius: 8px; /* Rounded corners */
+            font-size: 1rem; /* Font size */
+            text-align: center;
+            z-index: 1000; /* Ensure it's on top of other content */
+            opacity: 0; /* Start invisible for fade-in effect */
+            transition: opacity 0.3s ease-in-out; /* Smooth fade transition */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            white-space: nowrap; /* Prevent text from wrapping if it's short */
+        }
+
+        /* Style for when the message box is visible */
+        .custom-message-box.show {
+            opacity: 1; /* Fully opaque */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Main Affirmation Generator Card -->
+        <div class="card-container">
+            <h1 class="text-3xl font-extrabold text-teal-500 mb-6">Your Daily Spark! ✨</h1>
+            <p class="text-lg text-gray-700 mb-8">Get a personalized affirmation to brighten your day!</p>
+
+            <div class="mb-4 text-left">
+                <label for="userNameInput" class="block text-gray-600 text-sm font-bold mb-2">What's your name?</label>
+                <input type="text" id="userNameInput" class="input-field" placeholder="Enter your name (optional)">
+            </div>
+
+            <div class="mb-6 text-left">
+                <label for="moodSelect" class="block text-gray-600 text-sm font-bold mb-2">How are you feeling today?</label>
+                <select id="moodSelect" class="input-field">
+                    <option value="general">Just a good vibe!</option>
+                    <option value="happy">Happy 😊</option>
+                    <option value="stressed">Stressed 😟</option>
+                    <option value="motivated">Motivated 💪</option>
+                    <option value="calm">Calm 🧘‍♀️</option>
+                    <option value="anxious">Anxious 😬</option>
+                    <option value="depressed">Depressed 😔</option>
+                    <option value="mindful">Mindful 🧠</option>
+                </select>
+            </div>
+
+            <button id="generateAffirmationBtn" class="button-style">Generate My Affirmation</button>
+
+            <div id="affirmationOutput" class="affirmation-output">
+                Click the button to get your daily affirmation!
+            </div>
+
+            <!-- New Interactive Buttons -->
+            <div id="actionButtons" class="button-group mt-6 hidden">
+                <button id="copyBtn" class="button-style green">Copy</button>
+                <button id="favoriteBtn" class="button-style orange">Favorite</button>
+                <button id="resetBtn" class="button-style red">Reset</button>
+            </div>
+        </div>
+
+        <!-- Affirmation History and Favorites Section -->
+        <div class="history-container">
+            <h2 class="text-2xl font-extrabold text-teal-600 mb-4">History & Favorites</h2>
+            
+            <h3 class="text-xl font-bold text-gray-700 mb-2 mt-4">Last Generated:</h3>
+            <ul id="historyList" class="history-list mb-6">
+                <li class="text-gray-400">No affirmations generated yet.</li>
+            </ul>
+
+            <h3 class="text-xl font-bold text-gray-700 mb-2 mt-4">Your Favorites:</h3>
+            <ul id="favoritesList" class="favorites-list">
+                <li class="text-gray-400">No favorites yet.</li>
+            </ul>
+
+            <!-- Image under History & Favorites (using a reliable Pexels URL) -->
+            <img src="https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="Serene landscape symbolizing healing and tranquility"
+                 class="history-image"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/a7f3d0/2c7a7b?text=Healing+Image+Not+Found';">
+        </div>
+    </div>
+
+    <!-- Emotional Support Dog Modal -->
+    <div id="supportDogModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>A Friend to Comfort You!</h2>
+            <!-- Image for Emotional Support Dog -->
+            <img src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="A cute golden retriever dog looking calmly at the camera"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/cccccc/333333?text=Image+Not+Found';">
+            <p>Remember, it's okay to feel this way. Take a moment, breathe, and know you're not alone. This furry friend is here to send some calm your way!</p>
+            <button id="closeDogModalBtn" class="modal-close-btn">Got it, thanks!</button>
+        </div>
+    </div>
+
+    <!-- Yoga Visuals Modal (now used for "Mindful" mood) -->
+    <div id="yogaVisualModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Find Your Center</h2>
+            <!-- Image for Yoga Visual (now for Mindful mood) - UPDATED TO PUBLIC URL -->
+            <img src="https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="Person meditating in front of a cosmic healing universe visual"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0f2f1/00838f?text=Mindful+Visual+Not+Found';">
+            <p>Embrace the stillness within. Focus on your breath and find peace in the present moment.</p>
+            <button id="closeYogaModalBtn" class="modal-close-btn">Namaste</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Affirmation Data by Mood ---
+        const affirmationsByMood = {
+            general: [
+                "You are capable of amazing things today.",
+                "Your potential is limitless.",
+                "Every challenge is an opportunity to grow.",
+                "You are resilient and strong.",
+                "Believe in your unique journey.",
+                "Today is a fresh start, embrace it.",
+                "Your dreams are within reach.",
+                "You bring light to the world."
+            ],
+            happy: [
+                "Keep shining your light, you are a joy!",
+                "Your happiness is contagious.",
+                "Embrace this wonderful feeling!",
+                "Today is beautiful because you are in it.",
+                "Let your joy inspire others.",
+                "You deserve all the good things coming your way."
+            ],
+            stressed: [
+                "Take a deep breath; you've got this.",
+                "You are strong enough to overcome anything.",
+                "Prioritize your peace and well-being.",
+                "Release what you cannot control.",
+                "One moment at a time is all you need.",
+                "Your inner strength is greater than any challenge."
+            ],
+            motivated: [
+                "Go out there and conquer your goals!",
+                "Your determination will lead to success.",
+                "Every step forward, no matter how small, is progress.",
+                "Unleash your inner power!",
+                "You have the discipline to achieve anything you set your mind to.",
+                "Today is an opportunity to build the future you desire."
+            ],
+            calm: [
+                "Find your peace in the present moment.",
+                "Let tranquility guide your day.",
+                "All is well, and you are safe.",
+                "Breathe, and simply be.",
+                "Your mind is clear, and your spirit is serene.",
+                "Embrace the quiet moments of your day.",
+                "Observe your thoughts without judgment, like clouds passing by."
+            ],
+            // Anxious Mood Affirmations
+            anxious: [
+                "I am safe and secure. My breath brings calm.",
+                "This feeling will pass, just as the waves recede.",
+                "I am strong enough to handle this. I can ride this wave.",
+                "One gentle breath at a time, I find my center.",
+                "I choose peace over worry. My focus is on the present.",
+                "My breath is my anchor in this moment, grounding me.",
+                "I am in control of my reactions, not my fears.",
+                "I am supported and loved, and I release tension with each exhale."
+            ],
+            // Depressed Mood Affirmations
+            depressed: [
+                "This moment will pass, and better days are ahead. Light returns, like the dawn.",
+                "You are worthy of love and happiness, just as you are.",
+                "Even small steps are progress; honor your journey.",
+                "It's okay not to be okay. Allow yourself grace.",
+                "Reach out if you need support; you are not alone on this path.",
+                "You are valued just as you are, a unique part of the universe.",
+                "Light will find its way back into your life, through every open space.",
+                "Healing is a process, and you are on your way, guided by inner wisdom."
+            ],
+            // Mindful Mood Affirmations
+            mindful: [
+                "I am present in this moment, calm and centered.",
+                "My breath is my guide, flowing freely and peacefully.",
+                "I release all tension with each exhale.",
+                "I am connected to my inner wisdom and strength.",
+                "May I be happy, may I be well, may I be peaceful.",
+                "I am grateful for my body and all it does for me.",
+                "I flow with the rhythm of life, embracing change.",
+                "My mind is still, my spirit is free."
+            ]
+        };
+
+        // Emojis corresponding to moods
+        const moodEmojis = {
+            general: '✨',
+            happy: '😊',
+            stressed: '😥',
+            motivated: '🚀',
+            calm: '🧘',
+            anxious: '😬',
+            depressed: '😔',
+            mindful: '🧠'
+        };
+
+        // Define mood-specific background colors and text colors for the output
+        // Lighter backgrounds, darker text for readability on light BG
+        const moodColors = {
+            general: { bg: '#D1FAE5', text: '#065F46', border: '#A7F3D0' },
+            happy: { bg: '#FFFBEB', text: '#92400E', border: '#FDE68A' },
+            stressed: { bg: '#DBEAFE', text: '#1E40AF', border: '#93C5FD' },
+            motivated: { bg: '#EDE9FE', text: '#5B21B6', border: '#C4B5FD' },
+            calm: { bg: '#CCFBF1', text: '#0D9488', border: '#99F6E4' },
+            anxious: { bg: '#FEF2F2', text: '#B91C1C', border: '#FECACA' },
+            depressed: { bg: '#EFF6FF', text: '#1E3A8A', border: '#BFDBFE' },
+            mindful: { bg: '#E6FFFA', text: '#2C7A7B', border: '#B2F5EA' }
+        };
+
+
+        // Get references to HTML elements
+        const userNameInput = document.getElementById('userNameInput');
+        const moodSelect = document.getElementById('moodSelect');
+        const generateAffirmationBtn = document.getElementById('generateAffirmationBtn');
+        const affirmationOutput = document.getElementById('affirmationOutput');
+        const actionButtons = document.getElementById('actionButtons');
+        const copyBtn = document.getElementById('copyBtn');
+        const favoriteBtn = document.getElementById('favoriteBtn');
+        const resetBtn = document.getElementById('resetBtn');
+
+        const historyList = document.getElementById('historyList');
+        const favoritesList = document.getElementById('favoritesList');
+
+        // Modal elements
+        const supportDogModal = document.getElementById('supportDogModal');
+        const closeDogModalBtn = document.getElementById('closeDogModalBtn');
+        const yogaVisualModal = document.getElementById('yogaVisualModal');
+        const closeYogaModalBtn = document.getElementById('closeYogaModalBtn');
+
+        let currentAffirmation = ""; // To store the last generated affirmation for copy/favorite
+
+        // --- Local Storage Functions ---
+        const MAX_HISTORY_ITEMS = 5; // Keep only the last 5 in history
+
+        function getStoredFavorites() {
+            try {
+                const favorites = JSON.parse(localStorage.getItem('affirmationFavorites')) || [];
+                return favorites;
+            } catch (e) {
+                console.error("Error parsing favorites from localStorage", e);
+                return [];
+            }
+        }
+
+        function saveFavorites(favorites) {
+            localStorage.setItem('affirmationFavorites', JSON.stringify(favorites));
+        }
+
+        function getStoredHistory() {
+             try {
+                const history = JSON.parse(localStorage.getItem('affirmationHistory')) || [];
+                return history;
+            } catch (e) {
+                console.error("Error parsing history from localStorage", e);
+                return [];
+            }
+        }
+
+        function saveHistory(history) {
+            localStorage.setItem('affirmationHistory', JSON.stringify(history));
+        }
+
+        function renderFavorites() {
+            const favorites = getStoredFavorites();
+            favoritesList.innerHTML = ''; // Clear existing list
+
+            if (favorites.length === 0) {
+                favoritesList.innerHTML = '<li class="text-gray-400">No favorites yet.</li>';
+                return;
+            }
+
+            favorites.forEach((fav, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span>${fav.text} <span class="date">${fav.date}</span></span>
+                    <button class="remove-fav-btn" data-index="${index}">✖</button>
+                `;
+                favoritesList.appendChild(li);
+            });
+
+            // Add event listeners for remove buttons
+            favoritesList.querySelectorAll('.remove-fav-btn').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const indexToRemove = parseInt(event.target.dataset.index);
+                    removeFavorite(indexToRemove);
+                });
+            });
+        }
+
+        function removeFavorite(index) {
+            const favorites = getStoredFavorites();
+            favorites.splice(index, 1); // Remove item at index
+            saveFavorites(favorites);
+            renderFavorites(); // Re-render the list
+        }
+
+        function renderHistory() {
+            const history = getStoredHistory();
+            historyList.innerHTML = ''; // Clear existing list
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<li class="text-gray-400">No affirmations generated yet.</li>';
+                return;
+            }
+
+            history.forEach(item => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${item.text} <span class="date">${item.date}</span>
+                `;
+                historyList.appendChild(li);
+            });
+        }
+
+        function addAffirmationToHistory(affirmationText) {
+            const history = getStoredHistory();
+            const now = new Date();
+            const dateString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            history.unshift({ text: affirmationText, date: dateString }); // Add to beginning
+
+            if (history.length > MAX_HISTORY_ITEMS) {
+                history.pop(); // Remove oldest if list is too long
+            }
+            saveHistory(history);
+            renderHistory();
+        }
+
+        // --- Core Logic ---
+        function generateAndDisplayAffirmation() {
+            const userName = userNameInput.value.trim();
+            const selectedMood = moodSelect.value;
+
+            const relevantAffirmations = affirmationsByMood[selectedMood] || affirmationsByMood.general;
+            const randomIndex = Math.floor(Math.random() * relevantAffirmations.length);
+            let chosenAffirmation = relevantAffirmations[randomIndex];
+
+            if (userName !== "") {
+                chosenAffirmation = `${userName}, ${chosenAffirmation}`;
+            }
+            
+            // Add emoji based on mood
+            const moodEmoji = moodEmojis[selectedMood] || '';
+            affirmationOutput.innerHTML = `<span class="emoji">${moodEmoji}</span>${chosenAffirmation}`;
+            
+            // Update currentAffirmation for copy/favorite
+            currentAffirmation = chosenAffirmation;
+
+            // Update background color and text color based on mood
+            const colors = moodColors[selectedMood] || moodColors.general;
+            affirmationOutput.style.backgroundColor = colors.bg;
+            affirmationOutput.style.borderColor = colors.border;
+            affirmationOutput.style.color = colors.text; // Set text color as well
+
+            actionButtons.classList.remove('hidden'); // Show action buttons
+            addAffirmationToHistory(chosenAffirmation); // Add to history
+
+            // Handle modal pop-ups based on selected mood
+            hideSupportDogModal(); // Ensure previous modal is hidden
+            hideYogaVisualModal(); // Ensure previous modal is hidden
+
+            if (selectedMood === 'anxious' || selectedMood === 'depressed') {
+                showSupportDogModal();
+            } else if (selectedMood === 'mindful') { // Trigger for Mindful mood
+                showYogaVisualModal();
+            }
+        }
+
+        // --- New Interactive Features Functions ---
+
+        function copyAffirmation() {
+            if (currentAffirmation) {
+                navigator.clipboard.writeText(currentAffirmation)
+                    .then(() => {
+                        messagebox.alert('Affirmation copied to clipboard!'); // Using custom alert
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        messagebox.alert('Failed to copy affirmation.');
+                    });
+            }
+        }
+
+        function favoriteAffirmation() {
+            if (currentAffirmation) {
+                const favorites = getStoredFavorites();
+                const now = new Date();
+                const dateString = now.toLocaleDateString() + ' ' + now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const newFavorite = { text: currentAffirmation, date: dateString };
+
+                // Prevent duplicates
+                if (!favorites.some(fav => fav.text === newFavorite.text)) {
+                    favorites.unshift(newFavorite); // Add to the beginning
+                    saveFavorites(favorites);
+                    renderFavorites();
+                    messagebox.alert('Affirmation added to favorites!'); // Using custom alert
+                } else {
+                    messagebox.alert('This affirmation is already in your favorites!'); // Using custom alert
+                }
+            }
+        }
+
+        function resetGenerator() {
+            userNameInput.value = "";
+            moodSelect.value = "general"; // Reset to default option
+            
+            // Reset affirmation output to initial state
+            affirmationOutput.textContent = "Click the button to get your daily affirmation!";
+            affirmationOutput.style.backgroundColor = moodColors.general.bg;
+            affirmationOutput.style.borderColor = moodColors.general.border;
+            affirmationOutput.style.color = moodColors.general.text; // Reset text color
+
+            actionButtons.classList.add('hidden'); // Hide action buttons
+            currentAffirmation = ""; // Clear current affirmation
+            hideSupportDogModal(); // Hide any open modals
+            hideYogaVisualModal(); // Hide any open modals
+        }
+        
+        /**
+         * @namespace messagebox
+         * @description A utility object for displaying non-blocking, temporary alert messages.
+         */
+        const messagebox = {
+            /**
+             * Displays a custom alert message at the bottom left of the screen.
+             * The message box fades in, stays for 3 seconds, then fades out and is removed.
+             * @param {string} message - The text message to be displayed in the alert.
+             */
+            alert: function(message) {
+                // Remove any existing message box to prevent multiple alerts stacking up
+                const existingAlert = document.querySelector('.custom-message-box');
+                if (existingAlert) {
+                    existingAlert.remove();
+                }
+
+                // Create a new div element for the message box
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'custom-message-box'; // Apply base styling class
+                alertDiv.textContent = message; // Set the message text
+
+                // Append the message box to the body of the document
+                document.body.appendChild(alertDiv);
+
+                // Force a reflow to ensure the initial opacity: 0 is rendered before transition
+                // This makes the fade-in animation work correctly.
+                alertDiv.offsetHeight; 
+
+                // Add the 'show' class to trigger the fade-in effect
+                alertDiv.classList.add('show');
+
+                // Set a timeout to fade out and remove the message box after 3 seconds
+                setTimeout(() => {
+                    // Start the fade-out effect by removing the 'show' class
+                    alertDiv.classList.remove('show');
+
+                    // After the fade-out transition completes, remove the element from the DOM
+                    // Use a listener for 'transitionend' to ensure removal only after animation
+                    alertDiv.addEventListener('transitionend', () => {
+                        // Check if the element is still in the DOM before attempting to remove
+                        if (alertDiv.parentNode) {
+                            alertDiv.remove();
+                        }
+                    }, { once: true }); // Use { once: true } to automatically remove the listener after it fires
+                }, 3000); // 3000 milliseconds = 3 seconds
+            }
+        };
+
+
+        // --- Emotional Support Dog Modal Functions ---
+        function showSupportDogModal() {
+            supportDogModal.classList.add('show');
+        }
+
+        function hideSupportDogModal() {
+            supportDogModal.classList.remove('show');
+        }
+
+        // --- Yoga Visuals Modal Functions (now used for 'Mindful') ---
+        function showYogaVisualModal() {
+            yogaVisualModal.classList.add('show');
+        }
+
+        function hideYogaVisualModal() {
+            yogaVisualModal.classList.remove('show');
+        }
+
+
+        // --- Event Listeners ---
+        generateAffirmationBtn.addEventListener('click', generateAndDisplayAffirmation);
+        copyBtn.addEventListener('click', copyAffirmation);
+        favoriteBtn.addEventListener('click', favoriteAffirmation);
+        resetBtn.addEventListener('click', resetGenerator);
+
+        // Modal event listeners
+        closeDogModalBtn.addEventListener('click', hideSupportDogModal);
+        supportDogModal.addEventListener('click', (event) => {
+            // Close modal if clicking on the overlay, not the content itself
+            if (event.target === supportDogModal) {
+                hideSupportDogModal();
+            }
+        });
+
+        closeYogaModalBtn.addEventListener('click', hideYogaVisualModal);
+        yogaVisualModal.addEventListener('click', (event) => {
+            if (event.target === yogaVisualModal) {
+                hideYogaVisualModal();
+            }
+        });
+
+
+        userNameInput.addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                generateAndDisplayAffirmation();
+            }
+        });
+
+        // Initial render of favorites and history on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            renderFavorites();
+            renderHistory();
+            // Also set initial output styling on load
+            affirmationOutput.style.backgroundColor = moodColors.general.bg;
+            affirmationOutput.style.borderColor = moodColors.general.border;
+            affirmationOutput.style.color = moodColors.general.text;
+        });
+
+    </script>
+</body>
+</html>

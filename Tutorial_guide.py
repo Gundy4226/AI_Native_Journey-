@@ -49,7 +49,7 @@ MODULE_DATA = [
                 100: {'clue': "The function to show text to the user.", 'answer': "print()", 'explanation': "Used for output."},
                 200: {'clue': "The function to get text typed by the user.", 'answer': "input()", 'explanation': "Used for user input."},
                 300: {'clue': "A named container for storing data.", 'answer': "variable", 'explanation': "Variables hold different types of information."},
-                400: {'clue': "What does the `=` symbol do in `x = 5`?", 'answer': "assigns value", 'explanation': "It's the assignment operator, putting the value on the right into the variable on the left."},
+                400: {'clue': "What does the `=` symbol do in `x = 5`?", 'answer': "assignment operator", 'explanation': "It's the assignment operator, putting the value on the right into the variable on the left."},
                 500: {'clue': "What is the primary reason Python is recommended for beginners?", 'answer': "readability / beginner-friendly", 'explanation': "Python's syntax is often compared to plain English, making it easy to read and understand."}
             }
         }
@@ -321,8 +321,7 @@ class PythonCodingJeopardyTutorial:
                 if category not in self.answered_jeopardy_questions_in_module:
                     self.answered_jeopardy_questions_in_module[category] = {}
 
-                # Preserve answered state if it already exists for this question
-                # Otherwise, initialize it to False
+                # FIX: Preserve answered state if it already exists for this question
                 answered_state = False
                 if value in self.answered_jeopardy_questions_in_module[category]:
                     answered_state = self.answered_jeopardy_questions_in_module[category][value].get('answered', False)
