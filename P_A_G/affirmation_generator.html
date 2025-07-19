@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Affirmation Generator (Static Moods)</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Custom CSS will go here -->
+    <style>
+        /* CSS content will be placed here */
+    </style>
+</head>
+<body>
+    <div id="background-image-div"></div>
+    <div class="main-container">
+        <div class="card-container">
+            <h1 class="text-3xl font-extrabold text-teal-500 mb-6">Your Daily Spark! ✨</h1>
+            <p class="text-lg text-gray-700 mb-8">Get a personalized affirmation to brighten your day!</p>
+
+            <div class="mb-4 text-left">
+                <label for="userNameInput" class="block text-gray-600 text-sm font-bold mb-2">What's your name?</label>
+                <input type="text" id="userNameInput" class="input-field" placeholder="Enter your name (optional)">
+            </div>
+
+            <div class="mb-6 text-left">
+                <label for="moodSelect" class="block text-gray-600 text-sm font-bold mb-2">How are you feeling today?</label>
+                <select id="moodSelect" class="input-field">
+                    <option value="general">Just a good vibe!</option>
+                    <option value="happy">Happy 😊</option>
+                    <option value="stressed">Stressed 😟</option>
+                    <option value="motivated">Motivated 💪</option>
+                    <option value="calm">Calm 🧘‍♀️</option>
+                    <option value="anxious">Anxious 😬</option>
+                    <option value="depressed">Depressed 😔</option>
+                    <option value="mindful">Mindful 🧠</option>
+                    <option value="achy">Achy 😩</option>
+                </select>
+            </div>
+
+            <div class="button-group mb-4">
+                <button id="generateAffirmationBtn" class="button-style">Generate My Affirmation</button>
+            </div>
+
+            <div id="affirmationOutput" class="affirmation-output">
+                Select a mood and click the button!
+            </div>
+
+            <div id="actionButtons" class="button-group mt-6 hidden">
+                <button id="copyBtn" class="button-style green">Copy</button>
+                <button id="favoriteBtn" class="button-style orange">Favorite</button>
+                <button id="resetBtn" class="button-style red">Reset</button>
+            </div>
+
+            <div id="recommendationOutput" class="recommendation-output hidden">
+            </div>
+        </div>
+
+        <div class="history-container">
+            <h2 class="text-2xl font-extrabold text-teal-600 mb-4">History & Favorites</h2>
+            
+            <h3 class="text-xl font-bold text-gray-700 mb-2 mt-4">Last Generated:</h3>
+            <ul id="historyList" class="history-list mb-6">
+                <li class="text-gray-400">No affirmations generated yet.</li>
+            </ul>
+
+            <h3 class="text-xl font-bold text-gray-700 mb-2 mt-4">Your Favorites:</h3>
+            <ul id="favoritesList" class="favorites-list">
+                <li class="text-gray-400">No favorites yet.</li>
+            </ul>
+            <img src="https://images.pexels.com/photos/1032650/pexels-photo-1032650.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="Serene landscape symbolizing healing and tranquility"
+                 class="history-image"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/a7f3d0/2c7a7b?text=Healing+Image+Not+Found';">
+        </div>
+    </div>
+
+    <!-- Emotional Support Dog Modal -->
+    <div id="supportDogModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>A Friend to Comfort You!</h2>
+            <img src="https://images.pexels.com/photos/1108099/pexels-photo-1108099.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="A cute golden retriever dog looking calmly at the camera"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/cccccc/333333?text=Image+Not+Found';">
+            <p>Remember, it's okay to feel this way. Take a moment, breathe, and know you're not alone. This furry friend is here to send some calm your way!</p>
+            <button id="closeDogModalBtn" class="modal-close-btn">Got it, thanks!</button>
+        </div>
+    </div>
+
+    <!-- Yoga Visuals Modal (for Mindful and Achy) -->
+    <div id="yogaVisualModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Find Your Center</h2>
+            <img src="https://images.pexels.com/photos/3823039/pexels-photo-3823039.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="Person meditating in front of a cosmic healing universe visual"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/e0f2f1/00838f?text=Mindful+Visual+Not+Found';">
+            <p>Embrace the stillness within. Focus on your breath and find peace in the present moment. Here are some gentle poses to try to ease your body and mind:</p>
+            <p>
+                <strong>1. Child's Pose (Balasana):</strong> Kneel on your mat, big toes touching. Open your knees wide or keep them together. Fold forward, resting your torso between your thighs (or on them). Extend arms forward or rest them by your sides, palms up. Rest your forehead on the mat. Gentle stretches for hips, thighs, and ankles. A perfect resting pose to calm the brain and help relieve stress and fatigue.
+            </p>
+            <p>
+                <strong>2. Downward-Facing Dog Split (Eka Pada Adho Mukha Svanasana):</strong> From Downward-Facing Dog, lift one leg straight back and up towards the sky, keeping your hips square or gently opening them for a deeper stretch. This pose can help lengthen the spine, stretch the hamstrings, and open the hips. Remember to breathe deeply and move gently with your body.
+            </p>
+            <p>
+                <strong>3. Mountain Pose (Tadasana):</strong> Stand tall with feet together, arms at your sides. Feel grounded, drawing energy up from the earth through your spine. Breathe deeply, standing strong and still.
+            </p>
+            <p>
+                <strong>4. Corpse Pose (Savasana):</strong> Lie flat on your back, legs extended and slightly apart, arms by your sides with palms facing up. Close your eyes. Relax every part of your body. Focus on your breath without controlling it. This pose helps integrate the benefits of practice and deep relaxation.
+            </p>
+            <button id="closeYogaModalBtn" class="modal-close-btn">Namaste</button>
+        </div>
+    </div>
+
+    <div id="sunSalutationModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Sun Salutations for Stress Relief</h2>
+            <img src="https://images.pexels.com/photos/3822904/pexels-photo-3822904.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                 alt="Yoga sequence with sun salutations"
+                 onerror="this.onerror=null;this.src='https://placehold.co/400x300/a7f3d0/2c7a7b?text=Sun+Salutations+Image+Not+Found';">
+            <p>A gentle flow to release tension and find calm through movement and breath. Follow these steps for a basic Sun Salutation (Surya Namaskar A):</p>
+            <p>
+                <strong>1. Mountain Pose (Tadasana):</strong> Stand at the top of your mat, feet together, hands at prayer position at your heart. Ground through your feet, lengthen your spine.
+            </p>
+            <p>
+                <strong>2. Upward Salute (Urdhva Hastasana):</strong> Inhale, sweep your arms overhead, palms together, gaze up. Lengthen your side body.
+            </p>
+            <p>
+                <strong>3. Standing Forward Bend (Uttanasana):</strong> Exhale, fold forward from your hips, bringing your hands to the mat or shins. Relax your head and neck.
+            </p>
+            <p>
+                <strong>4. Halfway Lift (Ardha Uttanasana):</strong> Inhale, lift halfway, lengthen your spine, gaze forward. Hands can be on shins or fingertips on the mat.
+            </p>
+            <p>
+                <strong>5. High Plank (Phalakasana):</strong> Exhale, step your feet back to a high plank position. Shoulders over wrists, body in one straight line.
+            </p>
+            <p>
+                <strong>6. Low Plank (Chaturanga Dandasana):</strong> Exhale, lower halfway down, elbows hugging ribs. Keep your body straight. (Knees down is an option).
+            </p>
+            <p>
+                <strong>7. Upward-Facing Dog (Urdhva Mukha Svanasana):</strong> Inhale, roll over your toes, straighten arms, lift chest, shoulders down. Thighs off the mat.
+            </p>
+            <p>
+                <strong>8. Downward-Facing Dog (Adho Mukha Svanasana):</strong> Exhale, lift hips up and back, forming an inverted V-shape. Press through palms, lengthen spine, slight bend in knees.
+            </p>
+            <p>
+                <strong>9. Standing Forward Bend (Uttanasana):</strong> Inhale, step or hop feet between hands, fold forward.
+            </p>
+            <p>
+                <strong>10. Halfway Lift (Ardha Uttanasana):</strong> Inhale, lift halfway, lengthen spine.
+            </p>
+            <p>
+                <strong>11. Upward Salute (Urdhva Hastasana):</strong> Exhale, sweep arms up and overhead.
+            </p>
+            <p>
+                <strong>12. Mountain Pose (Tadasana):</strong> Exhale, bring hands to prayer at heart center.
+            </p>
+            <button id="closeSunSalutationModalBtn" class="modal-close-btn">Feel the Calm</button>
+        </div>
+    </div>
+
+    <!-- JavaScript will go here -->
+    <script>
+        /* JavaScript content will be placed here */
+    </script>
+</body>
+</html>
