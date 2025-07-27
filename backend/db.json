@@ -1,0 +1,34 @@
+{
+  "meals": [
+    {
+      "id": 1753640939424,
+      "date": "7/27/2025",
+      "waterIntake": "20",
+      "breakfast": {
+        "food": "Spinach wrap, eggs, turkey, & gouda cheese",
+        "time": "09:00",
+        "mood": "energized"
+      },
+      "lunch": {
+        "food": "T-Bone Steak cauliflower rice",
+        "time": "13:00",
+        "mood": "energized"
+      },
+      "dinner": {
+        "food": "Grilled salmon steamed broccoli",
+        "time": "17:00",
+        "mood": "satisfied"
+      },
+      "snacks": [
+        {
+          "food": "Mangoes, Strawberries, Blueberries",
+          "time": "11:00"
+        },
+        {
+          "food": "protein shake with yogurt",
+          "time": "19:00"
+        }
+      ]
+    }
+  ]
+}

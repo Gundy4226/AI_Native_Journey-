@@ -36,6 +36,7 @@ function addSnackInputWithData(food, time) {
 }
 
 function analyzeMeals() {
+    console.log('[DEBUG] analyzeMeals called.');
     const snacks = [];
     document.querySelectorAll('.snack-entry').forEach(entry => {
         const food = entry.querySelector('.snack-food').value.trim();
@@ -45,8 +46,15 @@ function analyzeMeals() {
         }
     });
 
+    // Check if we are in "edit mode" by looking for the hidden input's value
+    const idHolder = document.getElementById('meal-id-holder');
+    const existingId = idHolder && idHolder.value ? parseInt(idHolder.value, 10) : null;
+
+    console.log(`[DEBUG] Existing ID from holder: ${existingId}`);
+
     const mealData = {
-        id: Date.now(),
+        // Use the existing ID if it's there, otherwise create a new one
+        id: existingId || Date.now(),
         date: new Date().toLocaleDateString(),
         waterIntake: document.getElementById('water-intake').value,
         breakfast: {
@@ -67,14 +75,26 @@ function analyzeMeals() {
         snacks: snacks
     };
 
+    // If editing, preserve the original date instead of creating a new one.
+    if (existingId) {
+        const originalMeal = mealHistoryCache.find(m => m.id === existingId);
+        if (originalMeal) {
+            mealData.date = originalMeal.date;
+        }
+    }
+
     if (!mealData.breakfast.food && !mealData.lunch.food && !mealData.dinner.food && mealData.snacks.length === 0) {
         alert('Please log at least one meal or snack.');
         return;
     }
 
-    saveMealHistory(mealData);
-    loadHistory();
-    clearInputs();
+    console.log('[DEBUG] Saving meal data:', mealData);
+    saveMealHistory(mealData); // This will now handle the next steps
+
+    // Clear the ID holder after we've passed the data to be saved.
+    if (idHolder) {
+        idHolder.value = '';
+    }
 }
 
 function clearInputs() {
@@ -146,8 +166,8 @@ function generateSuggestionsForDay(mealData) {
     return suggestions;
 }
 
-function runAllAnalysis() {
-    const history = getMealHistory();
+async function runAllAnalysis() {
+    const history = await getMealHistory(); // Ensure we have the latest data
     if (history.length === 0) {
         document.getElementById('analysis-output').classList.add('hidden');
         document.getElementById('charts-container').classList.add('hidden');
@@ -168,7 +188,7 @@ function runAllAnalysis() {
     }
 }
 
-function generateWeeklySummary(history) {
+function generateWeeklySummary(history) { // This function is okay as it receives history
     const summary = { lateDinners: 0, skippedBreakfasts: 0, energizedMeals: 0, sluggishMeals: 0 };
 
     history.slice(0, 7).forEach(day => {
@@ -245,131 +265,249 @@ function renderMacroChart(macroData) {
     document.getElementById('charts-container').classList.remove('hidden');
 }
 
-function renderHistory() {
-    const history = getMealHistory();
+function renderHistory(history) {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
 
     history.forEach(meal => {
-        const li = document.createElement('li');
-        li.dataset.id = meal.id;
-        li.innerHTML = `
-            <span class="date">${meal.date} - Water: ${meal.waterIntake || 0} glasses</span>
-            <div class="meal-details">
-                <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} (at ${meal.breakfast.time || 'N/A'}) - <em>Felt: ${meal.breakfast.mood || 'N/A'}</em></p>
-                <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} (at ${meal.lunch.time || 'N/A'}) - <em>Felt: ${meal.lunch.mood || 'N/A'}</em></p>
-                <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} (at ${meal.dinner.time || 'N/A'}) - <em>Felt: ${meal.dinner.mood || 'N/A'}</em></p>
-                <p><strong>Snacks:</strong></p>
-                <ul>
-                    ${meal.snacks.map(s => `<li>${s.food} (at ${s.time || 'N/A'})</li>`).join('') || '<li>N/A</li>'}
-                </ul>
-            </div>
-            <div class="actions">
-                <button onclick="editMeal(${meal.id})">Edit</button>
-                <button class="delete" onclick="deleteMeal(${meal.id})">Delete</button>
-            </div>
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        header.textContent = `${meal.date} - Water: ${meal.waterIntake || 0} glasses`;
+
+        const mealInfo = document.createElement('div');
+        mealInfo.className = 'meal-info';
+        mealInfo.innerHTML = `
+            <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (Mood: ${meal.breakfast.mood})</p>
+            <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (Mood: ${meal.lunch.mood})</p>
+            <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (Mood: ${meal.dinner.mood})</p>
+            <p><strong>Snacks:</strong> ${meal.snacks.map(s => s.food).join(', ') || 'None'}</p>
+            <p><strong>Water:</strong> ${meal.waterIntake || 0} glasses</p>
         `;
-        historyList.appendChild(li);
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        actions.innerHTML = `
+            <button onclick="editMeal(${meal.id})">Edit</button>
+            <button onclick="deleteMeal(${meal.id})">Delete</button>
+        `;
+
+        card.appendChild(header);
+        card.appendChild(mealInfo);
+        card.appendChild(actions);
+        historyList.appendChild(card);
     });
 }
 
-// --- Data CRUD Functions ---
-function getMealHistory() {
-    return JSON.parse(localStorage.getItem('mealHistory')) || [];
-}
+// --- Data Persistence Layer (Replaced with API calls) ---
 
-function saveMealHistory(newMealData) {
-    let history = getMealHistory();
-    const existingIndex = history.findIndex(meal => meal.id === newMealData.id);
-    if (existingIndex > -1) {
-        history[existingIndex] = newMealData;
-    } else {
-        history.unshift(newMealData);
-    }
-    localStorage.setItem('mealHistory', JSON.stringify(history));
-}
+const API_URL = 'http://localhost:3000/api/meals';
 
-function deleteMeal(id, suppressConfirm = false) {
-    const confirmed = suppressConfirm || confirm('Are you sure you want to delete this meal log?');
-    if (confirmed) {
-        let history = getMealHistory();
-        history = history.filter(meal => meal.id !== id);
-        localStorage.setItem('mealHistory', JSON.stringify(history));
-        loadHistory();
+// Global variable to hold the history data
+let mealHistoryCache = [];
+
+async function getMealHistory() {
+    try {
+        const response = await fetch(API_URL);
+        mealHistoryCache = await response.json();
+        // The server returns meals in the order they were added, so we reverse it
+        // to show the most recent meal first, matching the old functionality.
+        return mealHistoryCache.slice().reverse();
+    } catch (error) {
+        console.error('Failed to fetch meal history:', error);
+        return []; // Return empty array on error
     }
 }
 
+async function saveMealHistory(newMealData) {
+    const isEditing = mealHistoryCache.some(meal => meal.id === newMealData.id);
+    const method = isEditing ? 'PUT' : 'POST';
+    const url = isEditing ? `${API_URL}/${newMealData.id}` : API_URL;
+
+    try {
+        console.log(`[DEBUG] Sending ${method} request to ${url}`);
+        await fetch(url, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newMealData)
+        });
+        // After saving, reload the history to reflect the changes
+        clearInputs();
+        await loadHistory(); // Ensure history is loaded before we potentially analyze
+    } catch (error) {
+        console.error('Failed to save meal data:', error);
+    }
+}
+
+async function deleteMeal(id, suppressConfirm = false) {
+    if (!suppressConfirm && !confirm('Are you sure you want to delete this entry?')) {
+        return;
+    }
+    try {
+        await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+        loadHistory(); // Refresh the list
+    } catch (error) {
+        console.error('Failed to delete meal:', error);
+    }
+}
+
+// editMeal now just populates the form. The actual update happens in saveMealHistory.
 function editMeal(id) {
-    const mealToEdit = getMealHistory().find(meal => meal.id === id);
+    console.log(`[DEBUG] editMeal called for ID: ${id}`);
+    const mealToEdit = mealHistoryCache.find(m => m.id === id);
     if (!mealToEdit) return;
 
-    document.getElementById('water-intake').value = mealToEdit.waterIntake || '';
-    document.getElementById('breakfast').value = mealToEdit.breakfast.food || '';
-    document.getElementById('breakfast-time').value = mealToEdit.breakfast.time || '';
-    document.getElementById('breakfast-mood').value = mealToEdit.breakfast.mood || 'none';
-    document.getElementById('lunch').value = mealToEdit.lunch.food || '';
-    document.getElementById('lunch-time').value = mealToEdit.lunch.time || '';
-    document.getElementById('lunch-mood').value = mealToEdit.lunch.mood || 'none';
-    document.getElementById('dinner').value = mealToEdit.dinner.food || '';
-    document.getElementById('dinner-time').value = mealToEdit.dinner.time || '';
-    document.getElementById('dinner-mood').value = mealToEdit.dinner.mood || 'none';
+    // Populate main fields
+    document.getElementById('water-intake').value = mealToEdit.waterIntake;
+    document.getElementById('breakfast').value = mealToEdit.breakfast.food;
+    document.getElementById('breakfast-time').value = mealToEdit.breakfast.time;
+    document.getElementById('breakfast-mood').value = mealToEdit.breakfast.mood;
+    document.getElementById('lunch').value = mealToEdit.lunch.food;
+    document.getElementById('lunch-time').value = mealToEdit.lunch.time;
+    document.getElementById('lunch-mood').value = mealToEdit.lunch.mood;
+    document.getElementById('dinner').value = mealToEdit.dinner.food;
+    document.getElementById('dinner-time').value = mealToEdit.dinner.time;
+    document.getElementById('dinner-mood').value = mealToEdit.dinner.mood;
 
+    // Populate snacks
     const snacksContainer = document.getElementById('snacks-container');
-    snacksContainer.innerHTML = '';
+    snacksContainer.innerHTML = ''; // Clear existing snack fields
     if (mealToEdit.snacks && mealToEdit.snacks.length > 0) {
         mealToEdit.snacks.forEach(snack => addSnackInputWithData(snack.food, snack.time));
     } else {
-        addSnackInput();
+        addSnackInput(); // Add one empty snack field if there are no snacks
     }
-    
-    deleteMeal(id, true);
+
+    // This hidden input will hold the ID for the save function to know it's an edit.
+    let idHolder = document.getElementById('meal-id-holder');
+    if (!idHolder) {
+        idHolder = document.createElement('input');
+        idHolder.type = 'hidden';
+        idHolder.id = 'meal-id-holder';
+        document.body.appendChild(idHolder);
+    }
+    idHolder.value = id;
 
     window.scrollTo(0, 0);
-    alert('Editing meal. Make your changes and click "Analyze My Day" to save the updated entry.');
+    console.log(`[DEBUG] Populated form for editing. Hidden ID holder value is now: ${idHolder.value}`);
 }
 
-function loadHistory() {
-    renderHistory();
-    runAllAnalysis();
+async function loadHistory() {
+    console.log('[DEBUG] loadHistory called.');
+    const history = await getMealHistory(); // history is already reversed here
+    console.log('[DEBUG] History loaded from server:', history);
+    renderHistory(history);
+    // Pass the already fetched history to the analysis functions
+    runAnalysisOnLoadedData(history); 
 }
 
 function clearHistory() {
-    if (confirm('Are you sure you want to clear all meal history? This cannot be undone.')) {
-        localStorage.removeItem('mealHistory');
-        loadHistory();
+    if (!confirm('Are you sure you want to delete ALL entries? This cannot be undone.')) {
+        return;
+    }
+    // To delete all, we can send multiple delete requests.
+    const historyToDelete = [...mealHistoryCache]; // Create a copy
+    Promise.all(historyToDelete.map(meal => deleteMeal(meal.id, true)))
+        .then(() => {
+            loadHistory(); // Refresh after all deletions are done
+        })
+        .catch(error => console.error('Failed to clear history:', error));
+}
+
+// This is the new function that will be called after data is loaded
+function runAnalysisOnLoadedData(history) {
+    console.log('[DEBUG] runAnalysisOnLoadedData called with history:', history);
+    if (history.length === 0) {
+        document.getElementById('analysis-output').classList.add('hidden');
+        document.getElementById('charts-container').classList.add('hidden');
+        document.getElementById('weekly-summary-container').classList.add('hidden');
+        return;
+    };
+
+    const todayLog = history[0];
+    const dailySuggestions = generateSuggestionsForDay(todayLog);
+    const dailyMacros = analyzeDay(todayLog);
+
+    displayDailyAnalysis(dailySuggestions);
+    renderMacroChart(dailyMacros);
+
+    if (history.length >= 3) {
+        const weeklySummary = generateWeeklySummary(history);
+        displayWeeklySummary(weeklySummary);
     }
 }
 
+// The export/import functionality worked with localStorage.
+// This will need to be re-thought or disabled in a server-based setup.
+// For now, let's disable them to prevent confusion.
 function exportHistory() {
-    const history = getMealHistory();
-    const dataStr = JSON.stringify(history, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'meal_history.json';
-    a.click();
-    URL.revokeObjectURL(url);
+    alert('Export is disabled in server mode.');
+    // const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('mealHistory'));
+    // const downloadAnchorNode = document.createElement('a');
+    // downloadAnchorNode.setAttribute("href", dataStr);
+    // downloadAnchorNode.setAttribute("download", "meal_history.json");
+    // document.body.appendChild(downloadAnchorNode);
+    // downloadAnchorNode.click();
+    // downloadAnchorNode.remove();
 }
 
 function importHistory(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+    alert('Import is disabled in server mode.');
+    // const file = event.target.files[0];
+    // if (!file) return;
+    // const reader = new FileReader();
+    // reader.onload = function(e) {
+    //     try {
+    //         const importedHistory = JSON.parse(e.target.result);
+    //         if (Array.isArray(importedHistory)) {
+    //             localStorage.setItem('mealHistory', JSON.stringify(importedHistory));
+    //             loadHistory();
+    //         } else {
+    //             alert('Invalid file format.');
+    //         }
+    //     } catch (err) {
+    //         alert('Error reading or parsing file.');
+    //     }
+    // };
+    // reader.readAsText(file);
+    // event.target.value = '';
+}
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const importedHistory = JSON.parse(e.target.result);
-            if (Array.isArray(importedHistory)) {
-                localStorage.setItem('mealHistory', JSON.stringify(importedHistory));
-                loadHistory();
-                alert('History imported successfully!');
-            } else {
-                throw new Error('Invalid file format.');
-            }
-        } catch (error) {
-            alert(`Error importing file: ${error.message}`);
-        }
-    };
-    reader.readAsText(file);
+
+function renderHistory(history) { // Now accepts history as an argument
+    const historyList = document.getElementById('history-list');
+    historyList.innerHTML = '';
+
+    history.forEach(meal => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        const header = document.createElement('div');
+        header.className = 'card-header';
+        header.textContent = `${meal.date} - Water: ${meal.waterIntake || 0} glasses`;
+
+        const mealInfo = document.createElement('div');
+        mealInfo.className = 'meal-info';
+        mealInfo.innerHTML = `
+            <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (Mood: ${meal.breakfast.mood})</p>
+            <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (Mood: ${meal.lunch.mood})</p>
+            <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (Mood: ${meal.dinner.mood})</p>
+            <p><strong>Snacks:</strong> ${meal.snacks.map(s => s.food).join(', ') || 'None'}</p>
+            <p><strong>Water:</strong> ${meal.waterIntake || 0} glasses</p>
+        `;
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+        actions.innerHTML = `
+            <button onclick="editMeal(${meal.id})">Edit</button>
+            <button onclick="deleteMeal(${meal.id})">Delete</button>
+        `;
+
+        card.appendChild(header);
+        card.appendChild(mealInfo);
+        card.appendChild(actions);
+        historyList.appendChild(card);
+    });
 }
