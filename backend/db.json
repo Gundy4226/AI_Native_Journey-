@@ -29,6 +29,70 @@
           "time": "19:00"
         }
       ]
+    },
+    {
+      "id": 1753642419879,
+      "date": "7/27/2025",
+      "waterIntake": "30",
+      "breakfast": {
+        "food": "Spinach wrap, eggs, turkey, & gouda cheese",
+        "time": "09:00",
+        "mood": "energized"
+      },
+      "lunch": {
+        "food": "T-Bone Steak cauliflower rice",
+        "time": "13:00",
+        "mood": "energized"
+      },
+      "dinner": {
+        "food": "Grilled salmon steamed broccoli",
+        "time": "17:00",
+        "mood": "satisfied"
+      },
+      "snacks": [
+        {
+          "food": "Mangoes, Strawberries, Blueberries",
+          "time": "11:00"
+        },
+        {
+          "food": "protein shake 50 gm of protein",
+          "time": "19:00"
+        }
+      ]
+    },
+    {
+      "id": 1753642755893,
+      "date": "7/27/2025",
+      "waterIntake": "16",
+      "breakfast": {
+        "food": "spinach wrap with eggs, turkey, and gouda cheese",
+        "time": "08:00",
+        "mood": "energized"
+      },
+      "lunch": {
+        "food": "T-Bone steak cauliflower rice",
+        "time": "12:00",
+        "mood": "energized"
+      },
+      "dinner": {
+        "food": "greek salad grilled chicken and broccoli",
+        "time": "17:00",
+        "mood": "energized"
+      },
+      "snacks": [
+        {
+          "food": "mango, strawbarries, and blue berry",
+          "time": "10:00"
+        },
+        {
+          "food": "Organic Protein shake",
+          "time": "14:00"
+        },
+        {
+          "food": "banana",
+          "time": "20:00"
+        }
+      ]
     }
   ]
 }

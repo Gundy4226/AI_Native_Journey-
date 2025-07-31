@@ -66,6 +66,15 @@ app.put('/api/meals/:id', (req, res) => {
   res.json(db.get('meals').find({ id: mealId }).value());
 });
 
+// GET /api/export - Export all data as JSON
+app.get('/api/export', (req, res) => {
+  const allMeals = db.get('meals').value();
+  // Set headers to prompt a file download on the client side
+  res.setHeader('Content-disposition', 'attachment; filename=meal_history.json');
+  res.setHeader('Content-type', 'application/json');
+  res.json(allMeals);
+});
+
 
 // --- Start Server ---
 app.listen(PORT, () => {

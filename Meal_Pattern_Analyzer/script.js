@@ -336,6 +336,14 @@ async function saveMealHistory(newMealData) {
         // After saving, reload the history to reflect the changes
         clearInputs();
         await loadHistory(); // Ensure history is loaded before we potentially analyze
+
+        // --- NEW: Automatically scroll to the analysis section ---
+        const analysisSection = document.getElementById('analysis-output');
+        if (analysisSection) {
+            analysisSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        // --- END NEW ---
+        
     } catch (error) {
         console.error('Failed to save meal data:', error);
     }
@@ -443,14 +451,9 @@ function runAnalysisOnLoadedData(history) {
 // This will need to be re-thought or disabled in a server-based setup.
 // For now, let's disable them to prevent confusion.
 function exportHistory() {
-    alert('Export is disabled in server mode.');
-    // const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(localStorage.getItem('mealHistory'));
-    // const downloadAnchorNode = document.createElement('a');
-    // downloadAnchorNode.setAttribute("href", dataStr);
-    // downloadAnchorNode.setAttribute("download", "meal_history.json");
-    // document.body.appendChild(downloadAnchorNode);
-    // downloadAnchorNode.click();
-    // downloadAnchorNode.remove();
+    // This now triggers a download directly from the server's export endpoint
+    // The correct path is /api/export, not /api/meals/export
+    window.location.href = 'http://localhost:3000/api/export';
 }
 
 function importHistory(event) {
