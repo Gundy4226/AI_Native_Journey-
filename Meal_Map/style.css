@@ -40,9 +40,10 @@ body {
     transition: background-color 0.3s, color 0.3s;
 }
 
-.nav-link:hover {
+.nav-link:hover, .nav-link:focus {
     background-color: #007bff;
     color: #fff;
+    outline: 2px solid #0056b3;
 }
 
 .container {
@@ -73,13 +74,7 @@ h1, h2 {
     font-weight: bold;
 }
 
-.meal-entry input[type="text"] {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box; /* Ensures padding doesn't affect width */
-}
+
 
 .input-group {
     display: flex;
@@ -108,8 +103,9 @@ h1, h2 {
     margin-top: 5px;
 }
 
-#add-snack-btn:hover {
+#add-snack-btn:hover, #add-snack-btn:focus {
     background-color: #218838;
+    outline: 2px solid #218838;
 }
 
 .snack-entry {
@@ -132,8 +128,9 @@ h1, h2 {
     margin-top: 1rem;
 }
 
-#analyze-btn:hover {
+#analyze-btn:hover, #analyze-btn:focus {
     background-color: #0056b3;
+    outline: 2px solid #0056b3;
 }
 
 #analysis-output {
@@ -205,23 +202,31 @@ h1, h2 {
     display: inline-block; /* For label */
 }
 
+#clear-history-btn:hover, #clear-history-btn:focus,
+#export-btn:hover, #export-btn:focus,
+.file-label:hover, .file-label:focus {
+    outline: 2px solid #dc3545;
+}
+
 #export-btn {
     background-color: #007bff;
 }
 
-#export-btn:hover {
+#export-btn:hover, #export-btn:focus {
     background-color: #0056b3;
+    outline: 2px solid #0056b3;
 }
 
 .file-label {
     background-color: #6c757d;
 }
 
-.file-label:hover {
+.file-label:hover, .file-label:focus {
     background-color: #5a6268;
+    outline: 2px solid #5a6268;
 }
 
-#clear-history-btn:hover {
+#clear-history-btn:hover, #clear-history-btn:focus {
     background-color: #c82333;
 }
 
@@ -248,11 +253,66 @@ h1, h2 {
     color: #dc3545;
 }
 
-#charts-container,
-#weekly-summary-container {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    border-top: 2px solid #eee;
+#history-list .actions button:hover, #history-list .actions button:focus {
+    background-color: #f0f0f0;
+    outline: 2px solid #007bff;
+}
+
+#history-list .actions button.delete:hover, #history-list .actions button.delete:focus {
+    background-color: #f0f0f0;
+    outline: 2px solid #dc3545;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px;
+    z-index: 1001;
+    transition: top 0.3s;
+}
+
+.skip-link:focus {
+    top: 0;
+}
+
+#generate-routine-btn {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background-color: #17a2b8;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    margin-top: 1rem;
+}
+
+#generate-routine-btn:hover, #generate-routine-btn:focus {
+    background-color: #138496;
+    outline: 2px solid #138496;
+}
+
+#routine-output {
+    margin-top: 1.5rem;
+    padding: 1rem;
     background: #f9f9f9;
-    border-radius: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
 }

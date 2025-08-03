@@ -1,36 +1,47 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Main buttons
-    document.getElementById('analyze-btn').addEventListener('click', analyzeMeals);
-    document.getElementById('add-snack-btn').addEventListener('click', addSnackInput);
+    const analyzeBtn = document.getElementById('analyze-btn');
+    if (analyzeBtn) {
+        // Main buttons
+        analyzeBtn.addEventListener('click', analyzeMeals);
+        document.getElementById('add-snack-btn').addEventListener('click', addSnackInput);
 
-    // History management
-    document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
-    document.getElementById('export-btn').addEventListener('click', exportHistory);
-    document.getElementById('import-file').addEventListener('change', importHistory);
-    
-    // Initial load
-    loadHistory();
-    addSnackInput(); // Add one snack field by default
+        // History management
+        document.getElementById('clear-history-btn').addEventListener('click', clearHistory);
+        document.getElementById('export-btn').addEventListener('click', exportHistory);
+        document.getElementById('import-file').addEventListener('change', importHistory);
+        document.getElementById('generate-routine-btn').addEventListener('click', generateMuscleRoutine);
+        
+        
+        // Initial load
+        loadHistory();
+        addSnackInput(); // Add one snack field by default
+    }
 });
 
 function addSnackInput() {
     const container = document.getElementById('snacks-container');
+    const snackId = `snack-${Date.now()}`;
     const newSnack = document.createElement('div');
     newSnack.className = 'snack-entry';
     newSnack.innerHTML = `
-        <input type="text" class="snack-food" placeholder="e.g., Apple">
-        <input type="time" class="snack-time">
+        <label for="${snackId}-food" class="sr-only">Snack Food</label>
+        <input type="text" id="${snackId}-food" class="snack-food" placeholder="e.g., Apple">
+        <label for="${snackId}-time" class="sr-only">Snack Time</label>
+        <input type="time" id="${snackId}-time" class="snack-time">
     `;
     container.appendChild(newSnack);
 }
 
 function addSnackInputWithData(food, time) {
     const container = document.getElementById('snacks-container');
+    const snackId = `snack-${Date.now()}`;
     const newSnack = document.createElement('div');
     newSnack.className = 'snack-entry';
     newSnack.innerHTML = `
-        <input type="text" class="snack-food" value="${food || ''}">
-        <input type="time" class="snack-time" value="${time || ''}">
+        <label for="${snackId}-food" class="sr-only">Snack Food</label>
+        <input type="text" id="${snackId}-food" class="snack-food" value="${food || ''}">
+        <label for="${snackId}-time" class="sr-only">Snack Time</label>
+        <input type="time" id="${snackId}-time" class="snack-time" value="${time || ''}">
     `;
     container.appendChild(newSnack);
 }
@@ -60,17 +71,20 @@ function analyzeMeals() {
         breakfast: {
             food: document.getElementById('breakfast').value.trim(),
             time: document.getElementById('breakfast-time').value,
-            mood: document.getElementById('breakfast-mood').value
+            mood: document.getElementById('breakfast-mood').value,
+            nutrition: {} // Placeholder for nutrition data
         },
         lunch: {
             food: document.getElementById('lunch').value.trim(),
             time: document.getElementById('lunch-time').value,
-            mood: document.getElementById('lunch-mood').value
+            mood: document.getElementById('lunch-mood').value,
+            nutrition: {} // Placeholder for nutrition data
         },
         dinner: {
             food: document.getElementById('dinner').value.trim(),
             time: document.getElementById('dinner-time').value,
-            mood: document.getElementById('dinner-mood').value
+            mood: document.getElementById('dinner-mood').value,
+            nutrition: {} // Placeholder for nutrition data
         },
         snacks: snacks
     };
@@ -108,6 +122,7 @@ function clearInputs() {
     document.getElementById('dinner').value = '';
     document.getElementById('dinner-time').value = '';
     document.getElementById('dinner-mood').value = 'none';
+    
     
     const snacksContainer = document.getElementById('snacks-container');
     snacksContainer.innerHTML = '';
@@ -265,33 +280,48 @@ function renderMacroChart(macroData) {
     document.getElementById('charts-container').classList.remove('hidden');
 }
 
-function renderHistory(history) {
+function renderHistory(history) { // Now accepts history as an argument
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
 
-    history.forEach(meal => {
-        const card = document.createElement('div');
-        card.className = 'card';
+    if (history.length === 0) {
+        historyList.innerHTML = '<li>No meal history yet.</li>';
+        return;
+    }
 
-        const header = document.createElement('div');
-        header.className = 'card-header';
-        header.textContent = `${meal.date} - Water: ${meal.waterIntake || 0} glasses`;
+    history.forEach(meal => {
+        const card = document.createElement('li');
+        card.className = 'meal-card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-labelledby', `meal-date-${meal.id}`);
+
+        const header = document.createElement('h3');
+        header.id = `meal-date-${meal.id}`;
+        header.textContent = meal.date;
 
         const mealInfo = document.createElement('div');
         mealInfo.className = 'meal-info';
+
+        const snacksHtml = (meal.snacks && meal.snacks.length > 0)
+            ? meal.snacks.map(s => `<p><strong>Snack:</strong> ${s.food}</p>${formatNutrition(s.nutrition)}`).join('')
+            : '<p><strong>Snacks:</strong> None</p>';
+
         mealInfo.innerHTML = `
             <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (Mood: ${meal.breakfast.mood})</p>
+            ${formatNutrition(meal.breakfast.nutrition)}
             <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (Mood: ${meal.lunch.mood})</p>
+            ${formatNutrition(meal.lunch.nutrition)}
             <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (Mood: ${meal.dinner.mood})</p>
-            <p><strong>Snacks:</strong> ${meal.snacks.map(s => s.food).join(', ') || 'None'}</p>
+            ${formatNutrition(meal.dinner.nutrition)}
+            ${snacksHtml}
             <p><strong>Water:</strong> ${meal.waterIntake || 0} glasses</p>
         `;
 
         const actions = document.createElement('div');
         actions.className = 'actions';
         actions.innerHTML = `
-            <button onclick="editMeal(${meal.id})">Edit</button>
-            <button onclick="deleteMeal(${meal.id})">Delete</button>
+            <button onclick="editMeal(${meal.id})" aria-label="Edit meal from ${meal.date}">Edit</button>
+            <button onclick="deleteMeal(${meal.id})" class="delete" aria-label="Delete meal from ${meal.date}">Delete</button>
         `;
 
         card.appendChild(header);
@@ -304,6 +334,7 @@ function renderHistory(history) {
 // --- Data Persistence Layer (Replaced with API calls) ---
 
 const API_URL = 'http://localhost:3000/api/meals';
+const NUTRITION_API_URL = 'http://localhost:3000/api/calorieninjas';
 
 // Global variable to hold the history data
 let mealHistoryCache = [];
@@ -322,6 +353,62 @@ async function getMealHistory() {
 }
 
 async function saveMealHistory(newMealData) {
+    // --- NEW: Fetch nutrition data before saving, with improved error handling ---
+    
+    // Create a more robust helper function to fetch nutrition for a meal type
+    const fetchNutrition = async (meal) => {
+        if (!meal.food) return; // Exit if there's no food to look up
+
+        try {
+            // Use POST request with a body for the new, more powerful endpoint
+            const response = await fetch(NUTRITION_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title: meal.food })
+            });
+            
+            if (response.ok) {
+                const nutritionData = await response.json();
+                // Check if the API returned valid nutrition data
+                // The new endpoint sums the nutrients, so we check if calories > 0
+                if (nutritionData.items && nutritionData.items.length > 0) {
+                    const item = nutritionData.items[0];
+                    meal.nutrition = {
+                        calories: Math.round(item.calories),
+                        fat: Math.round(item.fat_total_g),
+                        protein: Math.round(item.protein_g),
+                        carbs: Math.round(item.carbohydrates_total_g)
+                    };
+                } else {
+                    // Handle cases where CalorieNinjas doesn't recognize the food
+                    alert(`CalorieNinjas API worked, but it could not find any nutrition data for "${meal.food}".\n\nPlease try being more specific (e.g., "1 slice of whole wheat bread" instead of "bread").`);
+                    meal.nutrition = {}; // Ensure it's an empty object
+                }
+            } else {
+                // Handle HTTP errors (like 401 Unauthorized, 402 Payment Required, 500 Server Error)
+                const errorData = await response.json().catch(() => ({ error: "Could not parse the error response from server." })); 
+                const errorMessage = errorData.error || `The server responded with an error (Status: ${response.status}).`;
+                const errorDetails = errorData.details ? JSON.stringify(errorData.details) : 'No specific details were provided.';
+                alert(`Could not fetch nutrition data for "${meal.food}".\n\nReason: ${errorMessage}\nDetails: ${errorDetails}\n\nPlease check your backend server logs and your CalorieNinjas API key.`);
+            }
+        } catch (networkError) {
+            // Handle network errors (e.g., the backend server is not running)
+            console.error('Network error fetching nutrition data:', networkError);
+            alert(`Failed to connect to the backend server to get nutrition data for "${meal.food}".\n\nPlease make sure your 'node server.js' is running correctly.\n\nError: ${networkError.message}`);
+        }
+    };
+
+    // Fetch for all main meals and snacks in parallel
+    const nutritionPromises = [
+        fetchNutrition(newMealData.breakfast),
+        fetchNutrition(newMealData.lunch),
+        fetchNutrition(newMealData.dinner),
+        ...newMealData.snacks.map(snack => fetchNutrition(snack))
+    ];
+    await Promise.all(nutritionPromises);
+    
+    // --- END NEW ---
+
     const isEditing = mealHistoryCache.some(meal => meal.id === newMealData.id);
     const method = isEditing ? 'PUT' : 'POST';
     const url = isEditing ? `${API_URL}/${newMealData.id}` : API_URL;
@@ -425,27 +512,27 @@ function clearHistory() {
 }
 
 // This is the new function that will be called after data is loaded
-function runAnalysisOnLoadedData(history) {
-    console.log('[DEBUG] runAnalysisOnLoadedData called with history:', history);
-    if (history.length === 0) {
-        document.getElementById('analysis-output').classList.add('hidden');
-        document.getElementById('charts-container').classList.add('hidden');
-        document.getElementById('weekly-summary-container').classList.add('hidden');
-        return;
-    };
-
-    const todayLog = history[0];
-    const dailySuggestions = generateSuggestionsForDay(todayLog);
-    const dailyMacros = analyzeDay(todayLog);
-
-    displayDailyAnalysis(dailySuggestions);
-    renderMacroChart(dailyMacros);
-
-    if (history.length >= 3) {
-        const weeklySummary = generateWeeklySummary(history);
-        displayWeeklySummary(weeklySummary);
-    }
-}
+   function runAnalysisOnLoadedData(history) {
+       console.log('[DEBUG] runAnalysisOnLoadedData called with history:', history);
+       if (history.length === 0) {
+           document.getElementById('analysis-output').classList.add('hidden');
+           document.getElementById('charts-container').classList.add('hidden');
+           document.getElementById('weekly-summary-container').classList.add('hidden');
+           return;
+       };
+   
+       const todayLog = history[0];
+       const dailySuggestions = generateSuggestionsForDay(todayLog);
+       const dailyMacros = analyzeDay(todayLog);
+   
+       displayDailyAnalysis(dailySuggestions);
+       renderMacroChart(dailyMacros);
+   
+       if (history.length >= 3) {
+           const weeklySummary = generateWeeklySummary(history);
+           displayWeeklySummary(weeklySummary);
+       }
+   }
 
 // The export/import functionality worked with localStorage.
 // This will need to be re-thought or disabled in a server-based setup.
@@ -478,39 +565,86 @@ function importHistory(event) {
     // event.target.value = '';
 }
 
-
-function renderHistory(history) { // Now accepts history as an argument
-    const historyList = document.getElementById('history-list');
-    historyList.innerHTML = '';
-
-    history.forEach(meal => {
-        const card = document.createElement('div');
-        card.className = 'card';
-
-        const header = document.createElement('div');
-        header.className = 'card-header';
-        header.textContent = `${meal.date} - Water: ${meal.waterIntake || 0} glasses`;
-
-        const mealInfo = document.createElement('div');
-        mealInfo.className = 'meal-info';
-        mealInfo.innerHTML = `
-            <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (Mood: ${meal.breakfast.mood})</p>
-            <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (Mood: ${meal.lunch.mood})</p>
-            <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (Mood: ${meal.dinner.mood})</p>
-            <p><strong>Snacks:</strong> ${meal.snacks.map(s => s.food).join(', ') || 'None'}</p>
-            <p><strong>Water:</strong> ${meal.waterIntake || 0} glasses</p>
-        `;
-
-        const actions = document.createElement('div');
-        actions.className = 'actions';
-        actions.innerHTML = `
-            <button onclick="editMeal(${meal.id})">Edit</button>
-            <button onclick="deleteMeal(${meal.id})">Delete</button>
-        `;
-
-        card.appendChild(header);
-        card.appendChild(mealInfo);
-        card.appendChild(actions);
-        historyList.appendChild(card);
-    });
+function formatNutrition(nutrition) {
+    if (!nutrition || Object.keys(nutrition).length === 0) {
+        return ''; // Don't display anything if there's no nutrition data
+    }
+    return `
+        <div class="nutrition-details">
+            <p>Calories: ${nutrition.calories || 'N/A'}, Protein: ${nutrition.protein || 'N/A'}g, Fat: ${nutrition.fat || 'N/A'}g, Carbs: ${nutrition.carbs || 'N/A'}g</p>
+        </div>
+    `;
 }
+
+function generateMuscleRoutine() {
+    const routine = {
+        title: "3-Day Muscle-Building Split (Push/Pull/Legs)",
+        description: "This routine is designed to maximize muscle growth by targeting all major muscle groups over three days. Rest for 60-90 seconds between sets. Aim for progressive overload by increasing weight or reps over time.",
+        days: [
+            {
+                day: "Day 1: Push (Chest, Shoulders, Triceps)",
+                exercises: [
+                    "Bench Press: 3 sets of 5-8 reps",
+                    "Overhead Press: 3 sets of 8-12 reps",
+                    "Incline Dumbbell Press: 3 sets of 8-12 reps",
+                    "Lateral Raises: 3 sets of 12-15 reps",
+                    "Tricep Pushdowns: 3 sets of 10-15 reps"
+                ]
+            },
+            {
+                day: "Day 2: Pull (Back, Biceps)",
+                exercises: [
+                    "Pull-Ups or Lat Pulldowns: 3 sets of 8-12 reps",
+                    "Barbell Rows: 3 sets of 8-12 reps",
+                    "Face Pulls: 3 sets of 15-20 reps",
+                    "Bicep Curls: 3 sets of 10-15 reps",
+                    "Hammer Curls: 3 sets of 10-15 reps"
+                ]
+            },
+            {
+                day: "Day 3: Legs (Quads, Hamstrings, Calves)",
+                exercises: [
+                    "Squats: 3 sets of 5-8 reps",
+                    "Romanian Deadlifts: 3 sets of 8-12 reps",
+                    "Leg Press: 3 sets of 10-15 reps",
+                    "Leg Curls: 3 sets of 12-15 reps",
+                    "Calf Raises: 4 sets of 15-20 reps"
+                ]
+            }
+        ]
+    };
+
+    const outputContainer = document.getElementById('routine-output');
+    let html = `<h3 id="routine-title">${routine.title}</h3><p>${routine.description}</p>`;
+    routine.days.forEach((day, index) => {
+        const dayId = `day-${index + 1}`;
+        html += `<h4 id="${dayId}">${day.day}</h4><ul aria-labelledby="${dayId}">`;
+        day.exercises.forEach(exercise => {
+            html += `<li>${exercise}</li>`;
+        });
+        html += `</ul>`;
+    });
+
+    outputContainer.innerHTML = html;
+    outputContainer.classList.remove('hidden');
+    outputContainer.setAttribute('aria-labelledby', 'routine-title');
+}
+
+window.addEventListener('load', () => {
+    if (typeof axe !== 'undefined') {
+        console.log('Running accessibility test...');
+        axe.run(document.body, (err, results) => {
+            if (err) {
+                console.error('Accessibility test error:', err);
+                return;
+            }
+            if (results.violations.length === 0) {
+                console.log('Accessibility test passed! No violations found.');
+            } else {
+                console.warn(`Accessibility issues found (${results.violations.length}):`);
+                console.table(results.violations);
+            }
+        });
+    }
+});
+

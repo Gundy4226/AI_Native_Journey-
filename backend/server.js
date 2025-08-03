@@ -1,7 +1,10 @@
+require('dotenv').config(); // Load environment variables from .env file
+require('dotenv').config(); // Load environment variables from .env file
 const express = require('express');
 const cors = require('cors');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
+const axios = require('axios'); // Import axios
 
 // --- Server Setup ---
 const app = express();
@@ -21,6 +24,42 @@ const db = low(adapter);
 db.defaults({ meals: [] }).write();
 
 // --- API Endpoints ---
+
+// POST /api/nutrition - Get nutrition data for a food item from Spoonacular
+app.post('/api/nutrition', async (req, res) => {
+    // This route is now deprecated, but we'll keep it for a while to avoid breaking old clients.
+    // It will simply forward the request to the new CalorieNinjas route.
+res.redirect(307, '/api/calorieninjas');
+});
+
+
+app.post('/api/calorieninjas', async (req, res) => {
+    const { title } = req.body;
+    if (!title) {
+        return res.status(400).json({ error: 'Food title is required.' });
+    }
+
+    try {
+        const response = await axios.get(
+            'https://api.calorieninjas.com/v1/nutrition?query=' + title,
+            {
+                headers: {
+                    'X-Api-Key': process.env.CALORIENINJAS_API_KEY
+                }
+            }
+        );
+
+        res.json(response.data);
+
+    } catch (error) {
+        console.error('[DEBUG] Full error object from CalorieNinjas call:', error);
+        res.status(error.response ? error.response.status : 500).json({ 
+            error: 'Failed to fetch nutrition data from CalorieNinjas.',
+            details: error.response ? error.response.data : null
+        });
+    }
+});
+
 
 // GET /api/meals - Retrieve all meal entries
 app.get('/api/meals', (req, res) => {

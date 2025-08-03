@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meal Map</title>
+    <script src="https://cdn.jsdelivr.net/npm/axe-core"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <nav class="navbar" role="navigation" aria-label="Main Navigation">
+        <a href="#meal-logger" class="nav-link">Log Meals</a>
+        <a href="#analysis-output" class="nav-link">Analysis</a>
+        <a href="#history-container" class="nav-link">History</a>
+    </nav>
+
+    <div id="main-content" class="container" role="main">
+    <h1>Meal Map</h1>
+    <div id="meal-logger" class="meal-input-container" aria-labelledby="meal-logger-heading">
+        <h2 id="meal-logger-heading">Log Your Meals</h2>
+
+        <!-- Water Intake -->
+        <div class="meal-entry">
+            <label for="water-intake">Water Intake (glasses):</label>
+            <input type="number" id="water-intake" min="0" placeholder="e.g., 8" aria-label="Water intake in glasses">
+        </div>
+
+        <!-- Meal Entries with Mood -->
+        <div class="meal-entry">
+            <label for="breakfast">Breakfast:</label>
+            <div class="input-group">
+                <input type="text" id="breakfast" placeholder="e.g., Oatmeal with berries" aria-label="Breakfast food">
+                <input type="time" id="breakfast-time" aria-label="Breakfast time">
+                <select id="breakfast-mood" aria-label="How you felt after breakfast">
+                    <option value="none" selected disabled>How did it feel?</option>
+                    <option value="energized">Energized</option>
+                    <option value="satisfied">Satisfied</option>
+                    <option value="sluggish">Sluggish</option>
+                </select>
+            </div>
+        </div>
+        <div class="meal-entry">
+            <label for="lunch">Lunch:</label>
+            <div class="input-group">
+                <input type="text" id="lunch" placeholder="e.g., Grilled chicken salad" aria-label="Lunch food">
+                <input type="time" id="lunch-time" aria-label="Lunch time">
+                <select id="lunch-mood" aria-label="How you felt after lunch">
+                    <option value="none" selected disabled>How did it feel?</option>
+                    <option value="energized">Energized</option>
+                    <option value="satisfied">Satisfied</option>
+                    <option value="sluggish">Sluggish</option>
+                </select>
+            </div>
+        </div>
+        <div class="meal-entry">
+            <label for="dinner">Dinner:</label>
+            <div class="input-group">
+                <input type="text" id="dinner" placeholder="e.g., Salmon with roasted vegetables" aria-label="Dinner food">
+                <input type="time" id="dinner-time" aria-label="Dinner time">
+                <select id="dinner-mood" aria-label="How you felt after dinner">
+                    <option value="none" selected disabled>How did it feel?</option>
+                    <option value="energized">Energized</option>
+                    <option value="satisfied">Satisfied</option>
+                    <option value="sluggish">Sluggish</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Granular Snacks -->
+        <div class="meal-entry">
+            <label>Snacks:</label>
+            <div id="snacks-container" aria-live="polite">
+                <!-- Snack inputs will be added here -->
+            </div>
+            <button type="button" id="add-snack-btn" aria-label="Add a new snack input field">+ Add Snack</button>
+        </div>
+
+        <button id="analyze-btn" class="button-primary">Analyze My Day</button>
+    </div>
+
+    <div id="routine-generator" class="meal-input-container" aria-labelledby="routine-generator-heading">
+        <h2 id="routine-generator-heading">Generate a Workout Routine</h2>
+        <button id="generate-routine-btn" class="button-secondary">Generate Muscle-Building Routine</button>
+        <div id="routine-output" class="hidden" aria-live="polite"></div>
+    </div>
+    
+    <div id="analysis-output" class="hidden" aria-labelledby="analysis-heading">
+        <h2 id="analysis-heading">Today's Analysis</h2>
+        <div id="summary"></div>
+        <h3>Suggestions for Improvement:</h3>
+        <ul id="suggestions" aria-live="polite"></ul>
+    </div>
+    
+    <!-- Placeholder for Charts -->
+    <div id="charts-container" class="hidden" role="region" aria-labelledby="charts-heading">
+        <h2 id="charts-heading">Data Visualized</h2>
+        <canvas id="macro-chart" role="img" aria-label="Pie chart showing the distribution of macronutrients for the day"></canvas>
+    </div>
+
+    <!-- Placeholder for Weekly Summary -->
+    <div id="weekly-summary-container" class="hidden" role="region" aria-labelledby="weekly-summary-heading">
+        <h2 id="weekly-summary-heading">Your Week at a Glance</h2>
+        <div id="weekly-summary" aria-live="polite"></div>
+    </div>
+
+    <div id="history-container" role="region" aria-labelledby="history-heading">
+        <h2 id="history-heading">
+            Meal History
+            <div class="history-controls">
+                <label for="import-file" class="file-label button-secondary">Import</label>
+                <input type="file" id="import-file" accept=".json" style="display: none;" aria-label="Import meal history from a JSON file">
+                <button id="export-btn" class="button-secondary">Export</button>
+                <button id="clear-history-btn" class="button-danger">Clear All</button>
+            </div>
+        </h2>
+        <ul id="history-list" aria-live="polite">
+            <!-- Meal history will be dynamically inserted here -->
+        </ul>
+    </div>
+</div>
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
