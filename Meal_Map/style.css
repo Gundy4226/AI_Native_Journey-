@@ -316,3 +316,167 @@ h1, h2 {
     border-radius: 5px;
     border: 1px solid #ddd;
 }
+
+/* New Styles for Summary Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 2rem;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.summary-metric {
+    text-align: center;
+    border-right: 2px solid #eee;
+    padding-right: 2rem;
+}
+
+.metric-value {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #007bff;
+    line-height: 1;
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: #666;
+    display: block;
+}
+
+.metric-explanation {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 0.5rem;
+}
+
+.summary-details ul {
+    list-style-type: '✅';
+    padding-left: 20px;
+}
+
+.summary-details li {
+    padding-left: 10px;
+    margin-bottom: 0.5rem;
+}
+
+/* New Styles for Meal Plan */
+#meal-plan-output {
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+.meal-plan-day {
+    margin-bottom: 1rem;
+}
+.meal-plan-day:last-child {
+    margin-bottom: 0;
+}
+
+.meal-plan-day h4 {
+    color: #0056b3;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.meal-plan-day ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+#meal-plan-actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* New Styles for Wellness Quests */
+.quest-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid #ddd;
+    border-left: 5px solid #17a2b8; /* Quest color */
+    transition: background-color 0.3s;
+}
+
+.quest-card.completed {
+    border-left-color: #28a745; /* Completed color */
+    background-color: #f8fff8;
+}
+
+.quest-info h4 {
+    margin: 0 0 0.5rem 0;
+    color: #0056b3;
+}
+
+.quest-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.quest-progress {
+    text-align: right;
+    width: 120px;
+}
+
+.progress-bar-container {
+    background-color: #e9ecef;
+    border-radius: 5px;
+    height: 10px;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.progress-bar {
+    background-color: #17a2b8;
+    height: 100%;
+    border-radius: 5px;
+    transition: width 0.4s ease-in-out;
+}
+
+.quest-card.completed .progress-bar {
+    background-color: #28a745;
+}
+
+.quest-progress span {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #333;
+}
+
+/* New Styles for Community Tips */
+#community-tip-container {
+    background-color: #e6f7ff; /* A light blue background */
+    border: 1px solid #b3e0ff;
+    border-left: 5px solid #007bff;
+    padding: 1rem;
+    margin-top: 1.5rem;
+    border-radius: 8px;
+}
+
+#community-tip-container h4 {
+    margin: 0 0 0.5rem 0;
+    color: #0056b3;
+}
+
+#community-tip-text {
+    margin: 0;
+    font-style: italic;
+    color: #333;
+}

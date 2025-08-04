@@ -21,7 +21,7 @@ const adapter = new FileSync('db.json');
 const db = low(adapter);
 
 // Set default structure if db.json is empty
-db.defaults({ meals: [] }).write();
+db.defaults({ meals: [], quests: {}, community_tips: {} }).write();
 
 // --- API Endpoints ---
 
@@ -113,6 +113,18 @@ app.get('/api/export', (req, res) => {
   res.setHeader('Content-type', 'application/json');
   res.json(allMeals);
 });
+
+// --- NEW: Endpoints for Quests and Tips ---
+app.get('/api/quests', (req, res) => {
+    const quests = db.get('quests').value();
+    res.json(quests);
+});
+
+app.get('/api/community-tips', (req, res) => {
+    const tips = db.get('community_tips').value();
+    res.json(tips);
+});
+
 
 
 // --- Start Server ---

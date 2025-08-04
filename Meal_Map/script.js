@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('export-btn').addEventListener('click', exportHistory);
         document.getElementById('import-file').addEventListener('change', importHistory);
         document.getElementById('generate-routine-btn').addEventListener('click', generateMuscleRoutine);
-        
+        document.getElementById('generate-plan-btn').addEventListener('click', generateMealPlan);
         
         // Initial load
         loadHistory();
@@ -157,6 +157,58 @@ function analyzeDay(mealData) {
     return macroCounts;
 }
 
+function generatePersonalizedSuggestions(history) {
+    if (history.length < 3) {
+        return ["Keep logging for a few more days to unlock personalized suggestions!"];
+    }
+
+    const suggestions = new Set();
+    const allFoods = [];
+    let energizedMeals = [];
+
+    history.forEach(day => {
+        ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
+            const meal = day[mealType];
+            if (meal.food) {
+                allFoods.push(meal.food.toLowerCase());
+                if (meal.mood === 'energized') {
+                    energizedMeals.push({ meal: meal.food.toLowerCase(), type: mealType });
+                }
+            }
+        });
+    });
+
+    // Suggestion 1: Recommend a popular and energizing meal
+    if (energizedMeals.length > 0) {
+        const favoriteEnergizingMeal = energizedMeals.reduce((a, b, i, arr) => 
+            (arr.filter(v => v.meal === a.meal).length >= arr.filter(v => v.meal === b.meal).length) ? a : b, null);
+        
+        if (favoriteEnergizingMeal) {
+            suggestions.add(`You often feel energized after eating ${favoriteEnergizingMeal.meal}. Consider having it for ${favoriteEnergizingMeal.type} again soon!`);
+        }
+    }
+
+    // Suggestion 2: Nudge towards more variety if diet is repetitive
+    const foodVariety = new Set(allFoods).size;
+    if (allFoods.length > 5 && foodVariety / allFoods.length < 0.5) {
+        suggestions.add("You have a consistent routine. Try introducing a new vegetable or protein this week to diversify your nutrients.");
+    }
+
+    // Add back some of the original basic suggestions if relevant
+    const todayLog = history[0];
+    if (todayLog.waterIntake < 6) {
+        suggestions.add(`You logged ${todayLog.waterIntake || 0} glasses of water today. Aim for at least 6-8 glasses.`);
+    }
+    if (todayLog.dinner.time) {
+        const dinnerHour = parseInt(todayLog.dinner.time.split(':')[0], 10);
+        if (dinnerHour >= 21) {
+            suggestions.add('Eating dinner late may affect sleep quality. Consider an earlier mealtime.');
+        }
+    }
+
+    return suggestions.size > 0 ? Array.from(suggestions) : ["Your diet seems balanced today. Keep up the great work!"];
+}
+
 function generateSuggestionsForDay(mealData) {
     const suggestions = [];
     const macros = analyzeDay(mealData);
@@ -189,13 +241,13 @@ async function runAllAnalysis() {
         document.getElementById('weekly-summary-container').classList.add('hidden');
         return;
     };
-
-    const todayLog = history[0];
-    const dailySuggestions = generateSuggestionsForDay(todayLog);
-    const dailyMacros = analyzeDay(todayLog);
-
-    displayDailyAnalysis(dailySuggestions);
-    renderMacroChart(dailyMacros);
+   
+       const todayLog = history[0];
+       const dailySuggestions = generatePersonalizedSuggestions(history); // Use personalized suggestions
+       const dailyMacros = analyzeDay(todayLog);
+   
+       displayDailyAnalysis(dailySuggestions, tips); // Pass tips down
+       renderMacroChart(dailyMacros);
 
     if (history.length >= 3) {
         const weeklySummary = generateWeeklySummary(history);
@@ -203,47 +255,126 @@ async function runAllAnalysis() {
     }
 }
 
-function generateWeeklySummary(history) { // This function is okay as it receives history
-    const summary = { lateDinners: 0, skippedBreakfasts: 0, energizedMeals: 0, sluggishMeals: 0 };
+function generateWeeklySummary(history) {
+    const summary = {
+        lateDinners: 0,
+        skippedBreakfasts: 0,
+        energizedMeals: 0,
+        sluggishMeals: 0,
+        totalDays: Math.min(history.length, 7),
+        mealTimes: { breakfast: [], lunch: [], dinner: [] }
+    };
 
     history.slice(0, 7).forEach(day => {
-        if (day.dinner.time && parseInt(day.dinner.time.split(':')[0], 10) >= 21) summary.lateDinners++;
-        if (!day.breakfast.food) summary.skippedBreakfasts++;
+        if (day.dinner.time) {
+            const dinnerHour = parseInt(day.dinner.time.split(':')[0], 10);
+            if (dinnerHour >= 21) summary.lateDinners++;
+            summary.mealTimes.dinner.push(day.dinner.time);
+        }
+        
+        if (day.breakfast.food) {
+            summary.mealTimes.breakfast.push(day.breakfast.time);
+        } else {
+            summary.skippedBreakfasts++;
+        }
+
+        if(day.lunch.time) summary.mealTimes.lunch.push(day.lunch.time);
+
         ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
             if (day[mealType].mood === 'energized') summary.energizedMeals++;
             if (day[mealType].mood === 'sluggish') summary.sluggishMeals++;
         });
     });
 
-    return `
-        <p>Over the last ${history.length} days:</p>
-        <ul>
-            <li>You had a late dinner on <strong>${summary.lateDinners}</strong> day(s).</li>
-            <li>You skipped breakfast on <strong>${summary.skippedBreakfasts}</strong> day(s).</li>
-            <li>You felt energized after <strong>${summary.energizedMeals}</strong> meal(s) and sluggish after <strong>${summary.sluggishMeals}</strong>.</li>
-        </ul>
-    `;
+    // Calculate Rhythm Score
+    const calculateTimeConsistency = (times) => {
+        if (times.length < 2) return 100; // Perfect score if 0 or 1 time logged
+        const timeInMinutes = times.map(t => {
+            const [hours, minutes] = t.split(':').map(Number);
+            return hours * 60 + minutes;
+        });
+        const averageTime = timeInMinutes.reduce((a, b) => a + b, 0) / timeInMinutes.length;
+        const variance = timeInMinutes.reduce((a, b) => a + Math.pow(b - averageTime, 2), 0) / timeInMinutes.length;
+        const stdDev = Math.sqrt(variance);
+        // Normalize score: 100 for perfect consistency (std dev = 0), decreases as variance grows.
+        // A standard deviation of 60 mins results in a score around 50.
+        return Math.max(0, 100 - (stdDev / 60) * 50);
+    };
+
+    const breakfastConsistency = calculateTimeConsistency(summary.mealTimes.breakfast);
+    const lunchConsistency = calculateTimeConsistency(summary.mealTimes.lunch);
+    const dinnerConsistency = calculateTimeConsistency(summary.mealTimes.dinner);
+    
+    summary.rhythmScore = Math.round((breakfastConsistency + lunchConsistency + dinnerConsistency) / 3);
+
+    return summary;
+}
+
+// --- NEW: Community Tips ---
+function displayCommunityTip(suggestions, tips) {
+    const tipContainer = document.getElementById('community-tip-container');
+    const tipText = document.getElementById('community-tip-text');
+    let relevantTips = [];
+
+    suggestions.forEach(suggestion => {
+        if (suggestion.includes('protein')) relevantTips.push(...(tips.protein || []));
+        if (suggestion.includes('vegetables')) relevantTips.push(...(tips.vegetables || []));
+        if (suggestion.includes('water')) relevantTips.push(...(tips.water || []));
+    });
+
+    if (relevantTips.length === 0) {
+        relevantTips = tips.general || []; // Show a general tip if no specific ones apply
+    }
+
+    if (relevantTips.length > 0) {
+        const randomTip = relevantTips[Math.floor(Math.random() * relevantTips.length)];
+        tipText.textContent = randomTip;
+        tipContainer.classList.remove('hidden');
+    } else {
+        tipContainer.classList.add('hidden');
+    }
 }
 
 // --- Display Functions ---
-function displayDailyAnalysis(suggestions) {
+function displayDailyAnalysis(suggestions, tips) {
     const suggestionsEl = document.getElementById('suggestions');
     suggestionsEl.innerHTML = '';
     if (suggestions.length === 0) {
         suggestionsEl.innerHTML = '<li>Your diet seems balanced today. Keep up the great work!</li>';
+        document.getElementById('community-tip-container').classList.add('hidden');
     } else {
         suggestions.forEach(s => {
             const li = document.createElement('li');
             li.textContent = s;
             suggestionsEl.appendChild(li);
         });
+        displayCommunityTip(suggestions, tips); // Display a relevant community tip
     }
     document.getElementById('analysis-output').classList.remove('hidden');
 }
 
-function displayWeeklySummary(summaryHTML) {
+function displayWeeklySummary(summary) {
     const summaryEl = document.getElementById('weekly-summary');
-    summaryEl.innerHTML = summaryHTML;
+    
+    const rhythmExplanation = summary.rhythmScore > 80 ? "Fantastic! Your meal times are very consistent." :
+                              summary.rhythmScore > 60 ? "Good job. Your meal schedule is fairly regular." :
+                              "Try to eat your meals at more consistent times for better energy levels.";
+
+    summaryEl.innerHTML = `
+        <div class="summary-metric">
+            <span class="metric-value">${summary.rhythmScore}</span>
+            <span class="metric-label">Meal Rhythm Score</span>
+            <p class="metric-explanation">${rhythmExplanation}</p>
+        </div>
+        <div class="summary-details">
+            <p>Over the last ${summary.totalDays} days:</p>
+            <ul>
+                <li>You had a late dinner on <strong>${summary.lateDinners}</strong> day(s).</li>
+                <li>You skipped breakfast on <strong>${summary.skippedBreakfasts}</strong> day(s).</li>
+                <li>You felt energized after <strong>${summary.energizedMeals}</strong> meal(s) and sluggish after <strong>${summary.sluggishMeals}</strong>.</li>
+            </ul>
+        </div>
+    `;
     document.getElementById('weekly-summary-container').classList.remove('hidden');
 }
 
@@ -335,6 +466,8 @@ function renderHistory(history) { // Now accepts history as an argument
 
 const API_URL = 'http://localhost:3000/api/meals';
 const NUTRITION_API_URL = 'http://localhost:3000/api/calorieninjas';
+const QUESTS_API_URL = 'http://localhost:3000/api/quests';
+const TIPS_API_URL = 'http://localhost:3000/api/community-tips';
 
 // Global variable to hold the history data
 let mealHistoryCache = [];
@@ -491,11 +624,23 @@ function editMeal(id) {
 
 async function loadHistory() {
     console.log('[DEBUG] loadHistory called.');
-    const history = await getMealHistory(); // history is already reversed here
+    
+    // Fetch all data in parallel
+    const [history, quests, tips] = await Promise.all([
+        getMealHistory(),
+        fetch(QUESTS_API_URL).then(res => res.json()),
+        fetch(TIPS_API_URL).then(res => res.json())
+    ]);
+
     console.log('[DEBUG] History loaded from server:', history);
+    console.log('[DEBUG] Quests loaded from server:', quests);
+    console.log('[DEBUG] Tips loaded from server:', tips);
+
     renderHistory(history);
-    // Pass the already fetched history to the analysis functions
-    runAnalysisOnLoadedData(history); 
+    displayQuests(history, quests);
+    
+    // Pass the already fetched history and tips to the analysis functions
+    runAnalysisOnLoadedData(history, tips); 
 }
 
 function clearHistory() {
@@ -512,7 +657,7 @@ function clearHistory() {
 }
 
 // This is the new function that will be called after data is loaded
-   function runAnalysisOnLoadedData(history) {
+   function runAnalysisOnLoadedData(history, tips) {
        console.log('[DEBUG] runAnalysisOnLoadedData called with history:', history);
        if (history.length === 0) {
            document.getElementById('analysis-output').classList.add('hidden');
@@ -522,10 +667,10 @@ function clearHistory() {
        };
    
        const todayLog = history[0];
-       const dailySuggestions = generateSuggestionsForDay(todayLog);
+       const dailySuggestions = generatePersonalizedSuggestions(history); // Using the personalized one now
        const dailyMacros = analyzeDay(todayLog);
    
-       displayDailyAnalysis(dailySuggestions);
+       displayDailyAnalysis(dailySuggestions, tips); // Pass tips down
        renderMacroChart(dailyMacros);
    
        if (history.length >= 3) {
@@ -628,6 +773,240 @@ function generateMuscleRoutine() {
     outputContainer.innerHTML = html;
     outputContainer.classList.remove('hidden');
     outputContainer.setAttribute('aria-labelledby', 'routine-title');
+}
+
+// --- NEW: Meal Plan Generation ---
+const DIVERSE_MEAL_IDEAS = {
+    breakfast: [
+        "Greek Yogurt with Honey and Nuts",
+        "Avocado Toast with a Poached Egg",
+        "Smoothie with Spinach, Banana, and Protein Powder",
+        "Whole Wheat Pancakes with Berries",
+        "Breakfast Burrito with Black Beans and Salsa"
+    ],
+    lunch: [
+        "Lentil Soup with a side of Whole Wheat Bread",
+        "Turkey and Avocado Wrap",
+        "Mason Jar Salad with Chickpeas and a Vinaigrette",
+        "Leftover Salmon with Roasted Asparagus",
+        "Caprese Salad with Fresh Mozzarella, Tomatoes, and Basil"
+    ],
+    dinner: [
+        "Sheet Pan Lemon Herb Chicken with Potatoes and Green Beans",
+        "Black Bean Burgers on Whole Wheat Buns",
+        "Shrimp Scampi with Zucchini Noodles",
+        "Vegetable Stir-fry with Tofu and Brown Rice",
+        "Stuffed Bell Peppers with Quinoa and Ground Turkey"
+    ]
+};
+
+function createMealPlan(history) {
+    if (!history || history.length < 3) {
+        return null;
+    }
+
+    const getFavoriteMeal = (mealType) => {
+        const meals = history
+            .map(day => day[mealType])
+            .filter(meal => meal && meal.food && meal.mood === 'energized')
+            .map(meal => meal.food.toLowerCase());
+        
+        if (meals.length === 0) return null;
+        
+        return meals.reduce((a, b, i, arr) => 
+            (arr.filter(v => v === a).length >= arr.filter(v => v === b).length) ? a : b, null);
+    };
+
+    const usedMeals = new Set();
+
+    const getUniqueMeal = (mealType, favorite) => {
+        let meal;
+        // 50% chance to use a favorite if it exists and hasn't been used
+        if (favorite && !usedMeals.has(favorite) && Math.random() < 0.5) {
+            meal = favorite;
+        } else {
+            // Pick a random new meal, ensuring it's not a duplicate
+            const mealOptions = DIVERSE_MEAL_IDEAS[mealType];
+            do {
+                meal = mealOptions[Math.floor(Math.random() * mealOptions.length)];
+            } while (usedMeals.has(meal));
+        }
+        usedMeals.add(meal);
+        return meal;
+    };
+
+    const favorites = {
+        breakfast: getFavoriteMeal('breakfast'),
+        lunch: getFavoriteMeal('lunch'),
+        dinner: getFavoriteMeal('dinner')
+    };
+
+    const plan = {
+        day1: {
+            breakfast: getUniqueMeal('breakfast', favorites.breakfast),
+            lunch: getUniqueMeal('lunch', favorites.lunch),
+            dinner: getUniqueMeal('dinner', favorites.dinner)
+        },
+        day2: {
+            breakfast: getUniqueMeal('breakfast', favorites.breakfast),
+            lunch: getUniqueMeal('lunch', favorites.lunch),
+            dinner: getUniqueMeal('dinner', favorites.dinner)
+        },
+        day3: {
+            breakfast: getUniqueMeal('breakfast', favorites.breakfast),
+            lunch: getUniqueMeal('lunch', favorites.lunch),
+            dinner: getUniqueMeal('dinner', favorites.dinner)
+        }
+    };
+    return plan;
+}
+
+async function generateMealPlan() {
+    const history = await getMealHistory();
+    const plan = createMealPlan(history);
+
+    if (!plan) {
+        alert("Please log at least 3 days of meals to generate a personalized plan.");
+        return;
+    }
+
+    displayMealPlan(plan);
+}
+
+function displayMealPlan(plan) {
+    const planOutput = document.getElementById('meal-plan-output');
+    let html = '<h3>Your 3-Day Plan</h3>';
+    for (const day in plan) {
+        html += `<div class="meal-plan-day"><h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4><ul>`;
+        for (const mealType in plan[day]) {
+            html += `<li><strong>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}:</strong> ${plan[day][mealType]}</li>`;
+        }
+        html += '</ul></div>';
+    }
+    planOutput.innerHTML = html;
+    planOutput.classList.remove('hidden');
+    document.getElementById('meal-plan-actions').classList.remove('hidden');
+
+    // Add event listeners for the new buttons
+    document.getElementById('export-grocery-btn').addEventListener('click', () => exportToGrocery(plan));
+    document.getElementById('find-meal-kits-btn').addEventListener('click', () => findMealKits(plan));
+}
+
+function exportToGrocery(plan) {
+    const ingredients = new Set();
+    Object.values(plan).forEach(day => {
+        Object.values(day).forEach(meal => {
+            // Very basic keyword extraction. A real implementation would be more robust.
+            meal.split(' ').forEach(word => {
+                const cleanedWord = word.replace(/,$/, '').toLowerCase();
+                if (FOOD_KEYWORDS.protein.includes(cleanedWord) || FOOD_KEYWORDS.vegetables.includes(cleanedWord) || FOOD_KEYWORDS.fruits.includes(cleanedWord) || FOOD_KEYWORDS.carbs.includes(cleanedWord) || FOOD_KEYWORDS.fats.includes(cleanedWord)) {
+                    ingredients.add(cleanedWord);
+                }
+            });
+        });
+    });
+
+    let fileContent = "Your Meal Map Grocery List\n\n";
+    fileContent += "-------------------------\n\n";
+    
+    if (ingredients.size > 0) {
+        fileContent += Array.from(ingredients).map(item => `- ${item.charAt(0).toUpperCase() + item.slice(1)}`).join('\n');
+    } else {
+        fileContent += "No specific ingredients found in your meal plan. Try adding more variety!";
+    }
+
+    // Create a Blob from the content
+    const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
+    
+    // Create a temporary link to trigger the download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'grocery-list.txt';
+    
+    // Append to the document, click, and then remove
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function findMealKits(plan) {
+    // This would redirect to a meal kit service with search parameters.
+    const mainDinner = plan.day1.dinner || "healthy dinner";
+    const url = `https://www.hellofresh.com/recipes/search?q=${encodeURIComponent(mainDinner)}`;
+    
+    alert(`Searching for meal kits related to "${mainDinner}"...\n(You will be redirected to an external site)`);
+    window.open(url, '_blank');
+}
+
+// --- NEW: Wellness Quests ---
+function checkQuestProgress(history, quests) {
+    const progress = {
+        hydrate: 0,
+        earlyBird: 0,
+        rainbow: new Set()
+    };
+
+    let consecutiveHydrationDays = 0;
+    for (const day of history) {
+        // Hydration quest (consecutive days)
+        if (day.waterIntake >= 8) {
+            consecutiveHydrationDays++;
+        } else {
+            consecutiveHydrationDays = 0; // Reset if the streak is broken
+        }
+        progress.hydrate = Math.max(progress.hydrate, consecutiveHydrationDays);
+
+        // Early Bird quest
+        if (day.breakfast.time && new Date(`1970-01-01T${day.breakfast.time}`).getHours() < 9) {
+            progress.earlyBird++;
+        }
+
+        // Rainbow quest (unique vegetables over the last 7 days)
+        if (history.indexOf(day) < 7) {
+            const allFoods = [day.breakfast.food, day.lunch.food, day.dinner.food, ...day.snacks.map(s => s.food)].join(' ').toLowerCase();
+            FOOD_KEYWORDS.vegetables.forEach(veg => {
+                if (allFoods.includes(veg)) {
+                    progress.rainbow.add(veg);
+                }
+            });
+        }
+    }
+    
+    return {
+        hydrate: progress.hydrate,
+        earlyBird: Math.min(progress.earlyBird, quests.earlyBird.goal), // Cap progress at goal
+        rainbow: progress.rainbow.size
+    };
+}
+
+function displayQuests(history, quests) {
+    const progress = checkQuestProgress(history, quests);
+    const questsOutput = document.getElementById('quests-output');
+    let html = '';
+
+    for (const key in quests) {
+        const quest = quests[key];
+        const currentProgress = progress[key];
+        const percentage = Math.min((currentProgress / quest.goal) * 100, 100);
+        
+        html += `
+            <div class="quest-card ${percentage === 100 ? 'completed' : ''}">
+                <div class="quest-info">
+                    <h4>${quest.title} ${percentage === 100 ? '🏆' : ''}</h4>
+                    <p>${quest.description}</p>
+                </div>
+                <div class="quest-progress">
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: ${percentage}%;"></div>
+                    </div>
+                    <span>${currentProgress} / ${quest.goal}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    questsOutput.innerHTML = html;
+    document.getElementById('quests-container').classList.remove('hidden');
 }
 
 window.addEventListener('load', () => {

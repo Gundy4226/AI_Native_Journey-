@@ -90,6 +90,10 @@
         <div id="summary"></div>
         <h3>Suggestions for Improvement:</h3>
         <ul id="suggestions" aria-live="polite"></ul>
+        <div id="community-tip-container" class="hidden" aria-live="polite">
+            <h4>💡 Community Tip</h4>
+            <p id="community-tip-text"></p>
+        </div>
     </div>
     
     <!-- Placeholder for Charts -->
@@ -101,7 +105,30 @@
     <!-- Placeholder for Weekly Summary -->
     <div id="weekly-summary-container" class="hidden" role="region" aria-labelledby="weekly-summary-heading">
         <h2 id="weekly-summary-heading">Your Week at a Glance</h2>
-        <div id="weekly-summary" aria-live="polite"></div>
+        <div id="weekly-summary" class="summary-grid" aria-live="polite">
+            <!-- Summary content will be injected here by script.js -->
+        </div>
+    </div>
+
+    <!-- NEW: Meal Plan & Actions -->
+    <div id="meal-plan-container" class="meal-input-container" role="region" aria-labelledby="meal-plan-heading">
+        <h2 id="meal-plan-heading">Meal Plan & Actions</h2>
+        <button id="generate-plan-btn" class="button-primary">Generate a 3-Day Meal Plan</button>
+        <div id="meal-plan-output" class="hidden" aria-live="polite">
+            <!-- Generated meal plan will be injected here -->
+        </div>
+        <div id="meal-plan-actions" class="hidden">
+             <button id="export-grocery-btn" class="button-secondary">Export to Grocery List</button>
+             <button id="find-meal-kits-btn" class="button-secondary">Find Meal Kits</button>
+        </div>
+    </div>
+
+    <!-- NEW: Wellness Quests -->
+    <div id="quests-container" class="meal-input-container" role="region" aria-labelledby="quests-heading">
+        <h2 id="quests-heading">Wellness Quests</h2>
+        <div id="quests-output" aria-live="polite">
+            <!-- Quests will be injected here -->
+        </div>
     </div>
 
     <div id="history-container" role="region" aria-labelledby="history-heading">

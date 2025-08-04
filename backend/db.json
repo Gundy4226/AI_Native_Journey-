@@ -31,474 +31,18 @@
       ]
     },
     {
-      "id": 1753642419879,
-      "date": "7/27/2025",
-      "waterIntake": "30",
-      "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & gouda cheese",
-        "time": "09:00",
-        "mood": "energized"
-      },
-      "lunch": {
-        "food": "T-Bone Steak cauliflower rice",
-        "time": "13:00",
-        "mood": "energized"
-      },
-      "dinner": {
-        "food": "Grilled salmon steamed broccoli",
-        "time": "17:00",
-        "mood": "satisfied"
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:00"
-        },
-        {
-          "food": "protein shake 50 gm of protein",
-          "time": "19:00"
-        }
-      ]
-    },
-    {
-      "id": 1753642755893,
-      "date": "7/27/2025",
-      "waterIntake": "16",
-      "breakfast": {
-        "food": "spinach wrap with eggs, turkey, and gouda cheese",
-        "time": "08:00",
-        "mood": "energized"
-      },
-      "lunch": {
-        "food": "T-Bone steak cauliflower rice",
-        "time": "12:00",
-        "mood": "energized"
-      },
-      "dinner": {
-        "food": "greek salad grilled chicken and broccoli",
-        "time": "17:00",
-        "mood": "energized"
-      },
-      "snacks": [
-        {
-          "food": "mango, strawbarries, and blue berry",
-          "time": "10:00"
-        },
-        {
-          "food": "Organic Protein shake",
-          "time": "14:00"
-        },
-        {
-          "food": "banana",
-          "time": "20:00"
-        }
-      ]
-    },
-    {
-      "id": 1753832103246,
-      "date": "7/29/2025",
+      "id": 1754244566943,
+      "date": "8/3/2025",
       "waterIntake": "25",
       "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & gouda cheese",
+        "food": "1 boiled plantain with 1 egg over easy, fried cheese, and pork sausage",
         "time": "09:00",
-        "mood": "energized"
-      },
-      "lunch": {
-        "food": "T-Bone Steak cauliflower rice",
-        "time": "13:00",
-        "mood": "energized"
-      },
-      "dinner": {
-        "food": "Grilled salmon steamed broccoli",
-        "time": "18:00",
-        "mood": "energized"
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:00"
-        },
-        {
-          "food": "Orgain Protein shake with 1 cup of Olko Pro yogurt and frozen berries",
-          "time": "15:30"
-        }
-      ]
-    },
-    {
-      "id": 1753832826578,
-      "date": "7/29/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & gouda cheese 160z of Black Bustelo",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "T-Bone Steak cauliflower rice",
-        "time": "13:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "Grilled salmon steamed broccoli",
-        "time": "17:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:00"
-        },
-        {
-          "food": "Orgain Protein shake with Olko Pro yogurt and frozen berries",
-          "time": "15:00"
-        }
-      ]
-    },
-    {
-      "id": 1753833424097,
-      "date": "7/29/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "Spinach omelet with whole wheat toast",
-        "time": "09:00",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753833489466,
-      "date": "7/29/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "Spinach omelet with whole wheat toast",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753833664948,
-      "date": "7/29/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "1 Spinach torilla wrap, 2 eggs, 1 slice of turkey, & 2 slices of gouda cheese",
-        "time": "09:00",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "10oz T-Bone Steak 1 cup of cauliflower rice",
-        "time": "13:00",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon 2 cups steamed broccoli",
-        "time": "17:00",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:30"
-        },
-        {
-          "food": "Orgain Protein shake with Olko Pro yogurt and frozen berries",
-          "time": "15:30"
-        }
-      ]
-    },
-    {
-      "id": 1753834026953,
-      "date": "7/29/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "1 slice of whole wheat bread",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "10oz T-Bone Steak 1 cup of cauliflower rice",
-        "time": "13:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon 2 cups of steamed broccoli",
-        "time": "18:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:30"
-        },
-        {
-          "food": "16oz Orgain Protein shake with Olko Pro yogurt",
-          "time": "15:30"
-        }
-      ]
-    },
-    {
-      "id": 1753836704741,
-      "date": "7/29/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon, 2 cups steamed broccoli",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753836867173,
-      "date": "7/29/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon 2 cups steamed broccoli",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753837263107,
-      "date": "7/29/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon 2 cups steamed broccoli",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753916086528,
-      "date": "7/30/2025",
-      "waterIntake": "",
-      "breakfast": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "8oz Grilled salmon 2 cups steamed broccoli",
-        "time": "",
-        "mood": "none",
-        "nutrition": {}
-      },
-      "snacks": []
-    },
-    {
-      "id": 1753917652594,
-      "date": "7/30/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & gouda cheese 16oz Black Bustelo coffee",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "T-Bone Steak cauliflower rice",
-        "time": "13:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "Grilled salmon steamed broccoli",
-        "time": "17:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:30"
-        },
-        {
-          "food": "Orgain Protein shake with Olko Pro yogurt and frozen berries",
-          "time": "15:30"
-        }
-      ],
-      "exercise": {
-        "type": "none",
-        "duration": "",
-        "mood": "none"
-      }
-    },
-    {
-      "id": 1753918387696,
-      "date": "7/30/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & goua cheese 16oz Black Bustelo coffee 09:00am",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "lunch": {
-        "food": "10oz T-Bone Steak cauliflower rice",
-        "time": "13:00",
-        "mood": "energized",
-        "nutrition": {}
-      },
-      "dinner": {
-        "food": "Grilled salmon 2 cup steamed broccoli  05:00pm",
-        "time": "17:00",
-        "mood": "satisfied",
-        "nutrition": {}
-      },
-      "snacks": [
-        {
-          "food": "Mangoes, Strawberries, Blueberries",
-          "time": "11:00"
-        },
-        {
-          "food": "Orgain Protein shake with Olko Pro yogurt and frozen berries",
-          "time": "15:30"
-        }
-      ]
-    },
-    {
-      "id": 1753920707802,
-      "date": "7/30/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "Spinach wrap, eggs, turkey, & gouda cheese 16oz Black Bustelo coffee",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {
-          "calories": 325,
-          "fat": 7,
-          "protein": 9,
-          "carbs": 55
-        }
-      },
-      "lunch": {
-        "food": "T-Bone Steak cauliflower rice 01:00pm",
-        "time": "13:00",
         "mood": "energized",
         "nutrition": {
           "calories": 273,
-          "fat": 19,
-          "protein": 26,
-          "carbs": 0
-        }
-      },
-      "dinner": {
-        "food": "Grilled salmon steamed broccoli",
-        "time": "17:00",
-        "mood": "energized",
-        "nutrition": {
-          "calories": 205,
-          "fat": 13,
-          "protein": 22,
-          "carbs": 0
-        }
-      },
-      "snacks": [
-        {
-          "food": "1 Mango, 5 Strawberries, 10 Blueberries",
-          "time": "11:30"
-        },
-        {
-          "food": "Orgain Protein shake with Olko Pro yogurt and frozen berries",
-          "time": "15:00"
-        }
-      ]
-    },
-    {
-      "id": 1753921970267,
-      "date": "7/30/2025",
-      "waterIntake": "25",
-      "breakfast": {
-        "food": "1 Spinach torilla wrap, 2 eggs, 1 slice of turkey, & 2 slices of gouda cheese",
-        "time": "09:00",
-        "mood": "energized",
-        "nutrition": {
-          "calories": 42,
-          "fat": 1,
-          "protein": 5,
-          "carbs": 7
+          "fat": 0,
+          "protein": 2,
+          "carbs": 76
         }
       },
       "lunch": {
@@ -525,17 +69,7 @@
       },
       "snacks": [
         {
-          "food": "1 Mangoes, 6 Strawberries, 10 Blueberries",
-          "time": "11:30",
-          "nutrition": {
-            "calories": 197,
-            "fat": 1,
-            "protein": 3,
-            "carbs": 51
-          }
-        },
-        {
-          "food": "3:00pm      Orgain Protein shake with Olko Pro yogurt and frozen berries",
+          "food": "Orgain Protein shake with Olko Pro yogurt",
           "time": "15:30",
           "nutrition": {
             "calories": 58,
@@ -543,12 +77,22 @@
             "protein": 7,
             "carbs": 1
           }
+        },
+        {
+          "food": "1 mango, 6 strawberries, 10 blueberries",
+          "time": "",
+          "nutrition": {
+            "calories": 102,
+            "fat": 1,
+            "protein": 1,
+            "carbs": 24
+          }
         }
       ]
     },
     {
-      "id": 1753924669505,
-      "date": "7/30/2025",
+      "id": 1754346918277,
+      "date": "8/4/2025",
       "waterIntake": "25",
       "breakfast": {
         "food": "1 Spinach torilla wrap, 2 eggs, 1 slice of turkey, & 2 slices of gouda cheese",
@@ -562,7 +106,7 @@
         }
       },
       "lunch": {
-        "food": "10 oz T-Bone Steak 1 cup cauliflower rice",
+        "food": "10oz T-Bone Steak 1 cup of cauliflower rice",
         "time": "13:00",
         "mood": "energized",
         "nutrition": {
@@ -605,45 +149,44 @@
           }
         }
       ]
-    },
-    {
-      "id": 1754184828363,
-      "date": "8/2/2025",
-      "waterIntake": "1",
-      "breakfast": {
-        "food": "everything bagel with 1 scrambled egg and 1 slice of mozzarella cheese",
-        "time": "",
-        "mood": "none",
-        "nutrition": {
-          "calories": 265,
-          "fat": 1,
-          "protein": 11,
-          "carbs": 53
-        }
-      },
-      "lunch": {
-        "food": "1 cup of coffee with 6 sugars",
-        "time": "",
-        "mood": "none",
-        "nutrition": {
-          "calories": 2,
-          "fat": 0,
-          "protein": 0,
-          "carbs": 0
-        }
-      },
-      "dinner": {
-        "food": "chicken quesadilla",
-        "time": "",
-        "mood": "none",
-        "nutrition": {
-          "calories": 216,
-          "fat": 10,
-          "protein": 12,
-          "carbs": 19
-        }
-      },
-      "snacks": []
     }
-  ]
+  ],
+  "quests": {
+    "hydrate": {
+      "title": "Hydration Hero",
+      "description": "Log 8+ glasses of water for 3 days in a row.",
+      "goal": 3
+    },
+    "earlyBird": {
+      "title": "Early Bird",
+      "description": "Eat breakfast before 9 AM for 3 days.",
+      "goal": 3
+    },
+    "rainbow": {
+      "title": "Eat the Rainbow",
+      "description": "Log at least 4 different vegetables in one week.",
+      "goal": 4
+    }
+  },
+  "community_tips": {
+    "protein": [
+      "A pre-made protein shake is a lifesaver on busy mornings!",
+      "I started adding a scoop of unflavored collagen peptides to my coffee. It's an easy protein boost!",
+      "Greek yogurt has been a game-changer for my afternoon snacks. It's packed with protein."
+    ],
+    "vegetables": [
+      "I chop up a bunch of veggies on Sunday so they're ready to toss into salads or stir-fries all week.",
+      "Frozen vegetables are just as nutritious as fresh ones and they never go bad!",
+      "I started adding spinach to my fruit smoothies. You can't even taste it!"
+    ],
+    "water": [
+      "I bought a fun water bottle with time markers on it. It sounds silly, but it really helps!",
+      "I set a recurring reminder on my phone to drink a glass of water every hour.",
+      "Herbal tea counts towards your water goal! I love a cup of peppermint tea in the afternoon."
+    ],
+    "general": [
+      "Don't aim for perfection! Just focus on making one small, healthy choice at a time.",
+      "I found that planning my meals for just the next 3 days felt much less overwhelming than a full week."
+    ]
+  }
 }
