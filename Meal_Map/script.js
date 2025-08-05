@@ -11,6 +11,18 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('import-file').addEventListener('change', importHistory);
         document.getElementById('generate-routine-btn').addEventListener('click', generateMuscleRoutine);
         document.getElementById('generate-plan-btn').addEventListener('click', generateMealPlan);
+
+        // NEW: Event delegation for meal plan actions
+        document.getElementById('meal-plan-actions').addEventListener('click', (event) => {
+            if (!currentMealPlan) return; // Do nothing if no plan is set
+
+            if (event.target.id === 'export-grocery-btn') {
+                exportToGrocery(currentMealPlan);
+            }
+            if (event.target.id === 'find-meal-kits-btn') {
+                findMealKits(currentMealPlan);
+            }
+        });
         
         // Initial load
         loadHistory();
@@ -47,67 +59,72 @@ function addSnackInputWithData(food, time) {
 }
 
 function analyzeMeals() {
-    console.log('[DEBUG] analyzeMeals called.');
-    const snacks = [];
-    document.querySelectorAll('.snack-entry').forEach(entry => {
-        const food = entry.querySelector('.snack-food').value.trim();
-        const time = entry.querySelector('.snack-time').value;
-        if (food) {
-            snacks.push({ food, time });
+    try {
+        console.log('[DEBUG] analyzeMeals called.');
+        const snacks = [];
+        document.querySelectorAll('.snack-entry').forEach(entry => {
+            const food = entry.querySelector('.snack-food').value.trim();
+            const time = entry.querySelector('.snack-time').value;
+            if (food) {
+                snacks.push({ food, time, nutrition: {} }); // FIX: Ensure snacks have a nutrition property
+            }
+        });
+
+        // Check if we are in "edit mode" by looking for the hidden input's value
+        const idHolder = document.getElementById('meal-id-holder');
+        const existingId = idHolder && idHolder.value ? parseInt(idHolder.value, 10) : null;
+
+        console.log(`[DEBUG] Existing ID from holder: ${existingId}`);
+
+        const mealData = {
+            // Use the existing ID if it's there, otherwise create a new one
+            id: existingId || Date.now(),
+            date: new Date().toLocaleDateString(),
+            waterIntake: document.getElementById('water-intake').value,
+            breakfast: {
+                food: document.getElementById('breakfast').value.trim(),
+                time: document.getElementById('breakfast-time').value,
+                mood: document.getElementById('breakfast-mood').value,
+                nutrition: {} // Placeholder for nutrition data
+            },
+            lunch: {
+                food: document.getElementById('lunch').value.trim(),
+                time: document.getElementById('lunch-time').value,
+                mood: document.getElementById('lunch-mood').value,
+                nutrition: {} // Placeholder for nutrition data
+            },
+            dinner: {
+                food: document.getElementById('dinner').value.trim(),
+                time: document.getElementById('dinner-time').value,
+                mood: document.getElementById('dinner-mood').value,
+                nutrition: {} // Placeholder for nutrition data
+            },
+            snacks: snacks
+        };
+
+        // If editing, preserve the original date instead of creating a new one.
+        if (existingId) {
+            const originalMeal = mealHistoryCache.find(m => m.id === existingId);
+            if (originalMeal) {
+                mealData.date = originalMeal.date;
+            }
         }
-    });
 
-    // Check if we are in "edit mode" by looking for the hidden input's value
-    const idHolder = document.getElementById('meal-id-holder');
-    const existingId = idHolder && idHolder.value ? parseInt(idHolder.value, 10) : null;
-
-    console.log(`[DEBUG] Existing ID from holder: ${existingId}`);
-
-    const mealData = {
-        // Use the existing ID if it's there, otherwise create a new one
-        id: existingId || Date.now(),
-        date: new Date().toLocaleDateString(),
-        waterIntake: document.getElementById('water-intake').value,
-        breakfast: {
-            food: document.getElementById('breakfast').value.trim(),
-            time: document.getElementById('breakfast-time').value,
-            mood: document.getElementById('breakfast-mood').value,
-            nutrition: {} // Placeholder for nutrition data
-        },
-        lunch: {
-            food: document.getElementById('lunch').value.trim(),
-            time: document.getElementById('lunch-time').value,
-            mood: document.getElementById('lunch-mood').value,
-            nutrition: {} // Placeholder for nutrition data
-        },
-        dinner: {
-            food: document.getElementById('dinner').value.trim(),
-            time: document.getElementById('dinner-time').value,
-            mood: document.getElementById('dinner-mood').value,
-            nutrition: {} // Placeholder for nutrition data
-        },
-        snacks: snacks
-    };
-
-    // If editing, preserve the original date instead of creating a new one.
-    if (existingId) {
-        const originalMeal = mealHistoryCache.find(m => m.id === existingId);
-        if (originalMeal) {
-            mealData.date = originalMeal.date;
+        if (!mealData.breakfast.food && !mealData.lunch.food && !mealData.dinner.food && mealData.snacks.length === 0) {
+            alert('Please log at least one meal or snack.');
+            return;
         }
-    }
 
-    if (!mealData.breakfast.food && !mealData.lunch.food && !mealData.dinner.food && mealData.snacks.length === 0) {
-        alert('Please log at least one meal or snack.');
-        return;
-    }
+        console.log('[DEBUG] Saving meal data:', mealData);
+        saveMealHistory(mealData); // This will now handle the next steps
 
-    console.log('[DEBUG] Saving meal data:', mealData);
-    saveMealHistory(mealData); // This will now handle the next steps
-
-    // Clear the ID holder after we've passed the data to be saved.
-    if (idHolder) {
-        idHolder.value = '';
+        // Clear the ID holder after we've passed the data to be saved.
+        if (idHolder) {
+            idHolder.value = '';
+        }
+    } catch (error) {
+        console.error('An unexpected error occurred in analyzeMeals:', error);
+        alert(`A critical error occurred before saving your meal. Please check the console for details. Error: ${error.message}`);
     }
 }
 
@@ -131,10 +148,10 @@ function clearInputs() {
 
 // --- Analysis Engine ---
 const FOOD_KEYWORDS = {
-    protein: ['chicken', 'beef', 'fish', 'salmon', 'tuna', 'eggs', 'tofu', 'lentils', 'beans'],
-    carbs: ['bread', 'pasta', 'rice', 'potatoes', 'oatmeal', 'cereal', 'bagel'],
+    protein: ['chicken', 'beef', 'fish', 'salmon', 'tuna', 'eggs', 'tofu', 'lentils', 'beans', 'shrimp', 'scampi', 'bean', 'burgers'],
+    carbs: ['bread', 'pasta', 'rice', 'potatoes', 'oatmeal', 'cereal', 'bagel', 'noodles', 'buns', 'wheat'],
     fats: ['avocado', 'nuts', 'seeds', 'olive oil', 'cheese'],
-    vegetables: ['salad', 'broccoli', 'spinach', 'carrots', 'peppers', 'onions'],
+    vegetables: ['salad', 'broccoli', 'spinach', 'carrots', 'peppers', 'onions', 'green beans', 'zucchini'],
     fruits: ['apple', 'banana', 'berries', 'orange', 'grapes']
 };
 
@@ -180,8 +197,8 @@ function generatePersonalizedSuggestions(history) {
 
     // Suggestion 1: Recommend a popular and energizing meal
     if (energizedMeals.length > 0) {
-        const favoriteEnergizingMeal = energizedMeals.reduce((a, b, i, arr) => 
-            (arr.filter(v => v.meal === a.meal).length >= arr.filter(v => v.meal === b.meal).length) ? a : b, null);
+        const favoriteEnergizingMeal = energizedMeals.reduce((a, b) => 
+            (energizedMeals.filter(v => v.meal === a.meal).length >= energizedMeals.filter(v => v.meal === b.meal).length) ? a : b);
         
         if (favoriteEnergizingMeal) {
             suggestions.add(`You often feel energized after eating ${favoriteEnergizingMeal.meal}. Consider having it for ${favoriteEnergizingMeal.type} again soon!`);
@@ -195,7 +212,10 @@ function generatePersonalizedSuggestions(history) {
     }
 
     // Add back some of the original basic suggestions if relevant
-    const todayLog = history[0];
+    const todayLog = history.reduce((latest, current) => {
+        return new Date(current.date) > new Date(latest.date) ? current : latest;
+    });
+
     if (todayLog.waterIntake < 6) {
         suggestions.add(`You logged ${todayLog.waterIntake || 0} glasses of water today. Aim for at least 6-8 glasses.`);
     }
@@ -234,7 +254,12 @@ function generateSuggestionsForDay(mealData) {
 }
 
 async function runAllAnalysis() {
-    const history = await getMealHistory(); // Ensure we have the latest data
+    // NEW: Fetch all required data in parallel
+    const [history, tips] = await Promise.all([
+        getMealHistory(),
+        fetch(TIPS_API_URL).then(res => res.json()).catch(() => ({})) // Fetch tips, default to empty object on error
+    ]);
+
     if (history.length === 0) {
         document.getElementById('analysis-output').classList.add('hidden');
         document.getElementById('charts-container').classList.add('hidden');
@@ -471,6 +496,7 @@ const TIPS_API_URL = 'http://localhost:3000/api/community-tips';
 
 // Global variable to hold the history data
 let mealHistoryCache = [];
+let currentMealPlan = null; // NEW: To hold the currently generated plan
 
 async function getMealHistory() {
     try {
@@ -548,11 +574,18 @@ async function saveMealHistory(newMealData) {
 
     try {
         console.log(`[DEBUG] Sending ${method} request to ${url}`);
-        await fetch(url, {
+        const response = await fetch(url, {
             method: method,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newMealData)
         });
+
+        if (!response.ok) {
+            // Try to get more details from the server's response
+            const errorBody = await response.json().catch(() => ({ error: 'Could not parse error response.' }));
+            throw new Error(`Server responded with ${response.status}. Details: ${JSON.stringify(errorBody)}`);
+        }
+
         // After saving, reload the history to reflect the changes
         clearInputs();
         await loadHistory(); // Ensure history is loaded before we potentially analyze
@@ -562,10 +595,10 @@ async function saveMealHistory(newMealData) {
         if (analysisSection) {
             analysisSection.scrollIntoView({ behavior: 'smooth' });
         }
-        // --- END NEW ---
         
     } catch (error) {
         console.error('Failed to save meal data:', error);
+        alert(`A critical error occurred while saving your meal data.\n\nError: ${error.message}\n\nPlease check the console for more details.`);
     }
 }
 
@@ -625,11 +658,20 @@ function editMeal(id) {
 async function loadHistory() {
     console.log('[DEBUG] loadHistory called.');
     
-    // Fetch all data in parallel
+    // NEW: Fetch all data in parallel with robust error handling
     const [history, quests, tips] = await Promise.all([
-        getMealHistory(),
-        fetch(QUESTS_API_URL).then(res => res.json()),
-        fetch(TIPS_API_URL).then(res => res.json())
+        getMealHistory().catch(err => {
+            console.error("Failed to fetch history:", err);
+            return []; // Default to empty array on error
+        }),
+        fetch(QUESTS_API_URL).then(res => res.json()).catch(err => {
+            console.error("Failed to fetch quests:", err);
+            return {}; // Default to empty object on error
+        }),
+        fetch(TIPS_API_URL).then(res => res.json()).catch(err => {
+            console.error("Failed to fetch tips:", err);
+            return {}; // Default to empty object on error
+        })
     ]);
 
     console.log('[DEBUG] History loaded from server:', history);
@@ -666,7 +708,11 @@ function clearHistory() {
            return;
        };
    
-       const todayLog = history[0];
+       // NEW: Reliably find the most recent meal log by date, not by array order.
+       const todayLog = history.reduce((latest, current) => {
+           return new Date(current.date) > new Date(latest.date) ? current : latest;
+       });
+
        const dailySuggestions = generatePersonalizedSuggestions(history); // Using the personalized one now
        const dailyMacros = analyzeDay(todayLog);
    
@@ -874,6 +920,7 @@ async function generateMealPlan() {
 }
 
 function displayMealPlan(plan) {
+    currentMealPlan = plan; // NEW: Store the generated plan globally
     const planOutput = document.getElementById('meal-plan-output');
     let html = '<h3>Your 3-Day Plan</h3>';
     for (const day in plan) {
@@ -886,10 +933,6 @@ function displayMealPlan(plan) {
     planOutput.innerHTML = html;
     planOutput.classList.remove('hidden');
     document.getElementById('meal-plan-actions').classList.remove('hidden');
-
-    // Add event listeners for the new buttons
-    document.getElementById('export-grocery-btn').addEventListener('click', () => exportToGrocery(plan));
-    document.getElementById('find-meal-kits-btn').addEventListener('click', () => findMealKits(plan));
 }
 
 function exportToGrocery(plan) {
@@ -932,9 +975,18 @@ function exportToGrocery(plan) {
 function findMealKits(plan) {
     // This would redirect to a meal kit service with search parameters.
     const mainDinner = plan.day1.dinner || "healthy dinner";
-    const url = `https://www.hellofresh.com/recipes/search?q=${encodeURIComponent(mainDinner)}`;
+
+    // NEW: Extract keywords for a better search query
+    const allKeywords = Object.values(FOOD_KEYWORDS).flat();
+    const searchTerms = mainDinner.toLowerCase().split(' ')
+        .filter(word => allKeywords.includes(word.replace(/,$/, '')));
+
+    // Use the extracted terms, or default to the original if none are found
+    const searchQuery = searchTerms.length > 0 ? searchTerms.join(' ') : mainDinner;
+
+    const url = `https://www.hellofresh.com/recipes/search?q=${encodeURIComponent(searchQuery)}`;
     
-    alert(`Searching for meal kits related to "${mainDinner}"...\n(You will be redirected to an external site)`);
+    alert(`Searching for meal kits related to "${searchQuery}"...\n(You will be redirected to an external site)`);
     window.open(url, '_blank');
 }
 
