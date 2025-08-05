@@ -39,7 +39,14 @@ function addSnackInput() {
         <label for="${snackId}-food" class="sr-only">Snack Food</label>
         <input type="text" id="${snackId}-food" class="snack-food" placeholder="e.g., Apple">
         <label for="${snackId}-time" class="sr-only">Snack Time</label>
-        <input type="time" id="${snackId}-time" class="snack-time">
+        <select id="${snackId}-time" class="snack-time">
+            <option value="">Select a time</option>
+            <option value="10:00">10:00 AM</option>
+            <option value="10:30">10:30 AM</option>
+            <option value="15:00">3:00 PM</option>
+            <option value="15:30">3:30 PM</option>
+            <option value="22:00">10:00 PM</option>
+        </select>
     `;
     container.appendChild(newSnack);
 }
@@ -53,7 +60,14 @@ function addSnackInputWithData(food, time) {
         <label for="${snackId}-food" class="sr-only">Snack Food</label>
         <input type="text" id="${snackId}-food" class="snack-food" value="${food || ''}">
         <label for="${snackId}-time" class="sr-only">Snack Time</label>
-        <input type="time" id="${snackId}-time" class="snack-time" value="${time || ''}">
+        <select id="${snackId}-time" class="snack-time">
+            <option value="">Select a time</option>
+            <option value="10:00" ${time === '10:00' ? 'selected' : ''}>10:00 AM</option>
+            <option value="10:30" ${time === '10:30' ? 'selected' : ''}>10:30 AM</option>
+            <option value="15:00" ${time === '15:00' ? 'selected' : ''}>3:00 PM</option>
+            <option value="15:30" ${time === '15:30' ? 'selected' : ''}>3:30 PM</option>
+            <option value="22:00" ${time === '22:00' ? 'selected' : ''}>10:00 PM</option>
+        </select>
     `;
     container.appendChild(newSnack);
 }
