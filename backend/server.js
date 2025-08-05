@@ -25,6 +25,11 @@ db.defaults({ meals: [], quests: {}, community_tips: {} }).write();
 
 // --- API Endpoints ---
 
+// NEW: Add a root route for health checks and welcome message
+app.get('/', (req, res) => {
+    res.json({ message: "Welcome to the Meal Map API! Server is running." });
+});
+
 // POST /api/nutrition - Get nutrition data for a food item from Spoonacular
 app.post('/api/nutrition', async (req, res) => {
     // This route is now deprecated, but we'll keep it for a while to avoid breaking old clients.
