@@ -1,25 +1,35 @@
+/* --- General --- */
+:root {
+    --primary-color: #4CAF50; /* A fresh green */
+    --primary-hover: #45a049;
+    --secondary-color: #f4f4f4;
+    --text-color: #333;
+    --light-text-color: #f8f8f8;
+    --border-color: #ddd;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --danger-color: #f44336;
+    --danger-hover: #e53935;
+}
+
 html {
     scroll-behavior: smooth;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    font-family: 'Roboto', sans-serif; /* New font */
+    background-color: var(--secondary-color);
+    color: var(--text-color);
     line-height: 1.6;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
     margin: 0;
     padding: 20px;
-    padding-top: 80px; /* Add padding to body to avoid content being hidden by fixed navbar */
+    padding-top: 80px;
 }
 
+/* --- Navbar --- */
 .navbar {
     background: #fff;
     padding: 1rem 2rem;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 5px var(--shadow-color);
     position: fixed;
     top: 0;
     left: 0;
@@ -31,7 +41,7 @@ body {
 }
 
 .nav-link {
-    color: #0056b3;
+    color: var(--primary-color);
     text-decoration: none;
     font-weight: bold;
     font-size: 1rem;
@@ -41,228 +51,132 @@ body {
 }
 
 .nav-link:hover, .nav-link:focus {
-    background-color: #007bff;
+    background-color: var(--primary-color);
     color: #fff;
-    outline: 2px solid #0056b3;
 }
 
+/* --- Container & Cards --- */
 .container {
     background: #fff;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 0 25px var(--shadow-color);
     width: 100%;
-    max-width: 600px;
-}
-
-h1, h2 {
-    text-align: center;
-    color: #0056b3;
+    max-width: 700px;
 }
 
 .meal-input-container {
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.meal-input-container:last-of-type {
+    border-bottom: none;
 }
 
-.meal-entry {
-    margin-bottom: 1rem;
+/* --- Typography --- */
+h1, h2, h3, h4 {
+    color: var(--primary-color);
+    text-align: center;
+}
+h1 {
+    font-size: 2.5rem;
+}
+h2 {
+    font-size: 2rem;
 }
 
+/* --- Forms & Buttons --- */
 .meal-entry label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
 }
 
-
-
 .input-group {
     display: flex;
-    gap: 10px;
+    gap: 15px;
+    align-items: center;
 }
 
-.input-group input[type="text"] {
-    flex-grow: 1;
+input[type="text"],
+input[type="number"],
+select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
 }
 
-.input-group input[type="time"],
-.input-group select {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+.button {
+    display: inline-block;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.button:hover, .button:focus {
+    transform: translateY(-2px);
+}
+
+.button-primary {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    width: 100%;
+    margin-top: 1rem;
+}
+.button-primary:hover, .button-primary:focus {
+    background-color: var(--primary-hover);
+}
+
+.button-secondary {
+    background-color: #6c757d;
+    color: var(--light-text-color);
+}
+.button-secondary:hover, .button-secondary:focus {
+    background-color: #5a6268;
+}
+
+.button-danger {
+    background-color: var(--danger-color);
+    color: var(--light-text-color);
+}
+.button-danger:hover, .button-danger:focus {
+    background-color: var(--danger-hover);
 }
 
 #add-snack-btn {
-    background-color: #28a745;
-    color: white;
     padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
     font-size: 0.9rem;
     margin-top: 5px;
 }
 
-#add-snack-btn:hover, #add-snack-btn:focus {
-    background-color: #218838;
-    outline: 2px solid #218838;
-}
-
-.snack-entry {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-}
-
-#analyze-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-top: 1rem;
-}
-
-#analyze-btn:hover, #analyze-btn:focus {
-    background-color: #0056b3;
-    outline: 2px solid #0056b3;
-}
-
-#analysis-output {
-    border-top: 2px solid #eee;
-    padding-top: 1.5rem;
-}
-
-#suggestions {
-    list-style-type: '💡';
-    padding-left: 20px;
-}
-
-#suggestions li {
-    padding-left: 10px;
-    margin-bottom: 10px;
-}
-
-.hidden {
-    display: none;
-}
-
-#history-container {
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 2px solid #eee;
-}
-
-#history-container h2 {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.history-controls {
-    display: flex;
-    gap: 10px;
-}
-
-#history-list {
-    list-style: none;
-    padding: 0;
-}
-
-#history-list li {
-    background: #f9f9f9;
-    padding: 1rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
+/* --- History & Analysis --- */
+.meal-card {
+    background: #fdfdfd;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     margin-bottom: 1rem;
 }
 
-#history-list .date {
-    font-weight: bold;
-    color: #0056b3;
-    display: block;
-    margin-bottom: 0.5rem;
+.quest-card {
+    background-color: #fff;
+    border-left: 5px solid var(--primary-color);
 }
 
-#clear-history-btn,
-#export-btn,
-.file-label {
-    background-color: #dc3545;
-    color: white;
-    padding: 8px 15px;
-    border: none;
+#suggestions li {
+    background-color: #f9f9f9;
+    padding: 10px;
     border-radius: 5px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    display: inline-block; /* For label */
 }
 
-#clear-history-btn:hover, #clear-history-btn:focus,
-#export-btn:hover, #export-btn:focus,
-.file-label:hover, .file-label:focus {
-    outline: 2px solid #dc3545;
-}
-
-#export-btn {
-    background-color: #007bff;
-}
-
-#export-btn:hover, #export-btn:focus {
-    background-color: #0056b3;
-    outline: 2px solid #0056b3;
-}
-
-.file-label {
-    background-color: #6c757d;
-}
-
-.file-label:hover, .file-label:focus {
-    background-color: #5a6268;
-    outline: 2px solid #5a6268;
-}
-
-#clear-history-btn:hover, #clear-history-btn:focus {
-    background-color: #c82333;
-}
-
-#history-list li .meal-details {
-    margin-left: 20px;
-}
-#history-list li .meal-details p {
-    margin: 5px 0;
-}
-#history-list .actions {
-    margin-top: 10px;
-}
-#history-list .actions button {
-    background: none;
-    border: 1px solid #007bff;
-    color: #007bff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-}
-#history-list .actions button.delete {
-    border-color: #dc3545;
-    color: #dc3545;
-}
-
-#history-list .actions button:hover, #history-list .actions button:focus {
-    background-color: #f0f0f0;
-    outline: 2px solid #007bff;
-}
-
-#history-list .actions button.delete:hover, #history-list .actions button.delete:focus {
-    background-color: #f0f0f0;
-    outline: 2px solid #dc3545;
-}
-
+/* Accessibility */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -275,208 +189,15 @@ h1, h2 {
     border: 0;
 }
 
-.skip-link {
-    position: absolute;
-    top: -40px;
-    left: 0;
+.skip-link:focus {
+    top: 10px;
+    left: 10px;
     background: #000;
     color: #fff;
     padding: 8px;
     z-index: 1001;
-    transition: top 0.3s;
 }
 
-.skip-link:focus {
-    top: 0;
-}
-
-#generate-routine-btn {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    background-color: #17a2b8;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: bold;
-    margin-top: 1rem;
-}
-
-#generate-routine-btn:hover, #generate-routine-btn:focus {
-    background-color: #138496;
-    outline: 2px solid #138496;
-}
-
-#routine-output {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    background: #f9f9f9;
-    border-radius: 5px;
-    border: 1px solid #ddd;
-}
-
-/* New Styles for Summary Grid */
-.summary-grid {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
-    gap: 2rem;
-    align-items: center;
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.summary-metric {
-    text-align: center;
-    border-right: 2px solid #eee;
-    padding-right: 2rem;
-}
-
-.metric-value {
-    font-size: 3rem;
-    font-weight: bold;
-    color: #007bff;
-    line-height: 1;
-}
-
-.metric-label {
-    font-size: 1rem;
-    color: #666;
-    display: block;
-}
-
-.metric-explanation {
-    font-size: 0.9rem;
-    color: #777;
-    margin-top: 0.5rem;
-}
-
-.summary-details ul {
-    list-style-type: '✅';
-    padding-left: 20px;
-}
-
-.summary-details li {
-    padding-left: 10px;
-    margin-bottom: 0.5rem;
-}
-
-/* New Styles for Meal Plan */
-#meal-plan-output {
-    margin-top: 1.5rem;
-    padding: 1.5rem;
-    background: #f9f9f9;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-}
-
-.meal-plan-day {
-    margin-bottom: 1rem;
-}
-.meal-plan-day:last-child {
-    margin-bottom: 0;
-}
-
-.meal-plan-day h4 {
-    color: #0056b3;
-    border-bottom: 2px solid #eee;
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.meal-plan-day ul {
-    list-style: none;
-    padding-left: 0;
-}
-
-#meal-plan-actions {
-    margin-top: 1rem;
-    display: flex;
-    gap: 1rem;
-    justify-content: center;
-}
-
-/* New Styles for Wellness Quests */
-.quest-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: 1px solid #ddd;
-    border-left: 5px solid #17a2b8; /* Quest color */
-    transition: background-color 0.3s;
-}
-
-.quest-card.completed {
-    border-left-color: #28a745; /* Completed color */
-    background-color: #f8fff8;
-}
-
-.quest-info h4 {
-    margin: 0 0 0.5rem 0;
-    color: #0056b3;
-}
-
-.quest-info p {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #666;
-}
-
-.quest-progress {
-    text-align: right;
-    width: 120px;
-}
-
-.progress-bar-container {
-    background-color: #e9ecef;
-    border-radius: 5px;
-    height: 10px;
-    width: 100%;
-    margin-bottom: 5px;
-}
-
-.progress-bar {
-    background-color: #17a2b8;
-    height: 100%;
-    border-radius: 5px;
-    transition: width 0.4s ease-in-out;
-}
-
-.quest-card.completed .progress-bar {
-    background-color: #28a745;
-}
-
-.quest-progress span {
-    font-size: 0.8rem;
-    font-weight: bold;
-    color: #333;
-}
-
-/* New Styles for Community Tips */
-#community-tip-container {
-    background-color: #e6f7ff; /* A light blue background */
-    border: 1px solid #b3e0ff;
-    border-left: 5px solid #007bff;
-    padding: 1rem;
-    margin-top: 1.5rem;
-    border-radius: 8px;
-}
-
-#community-tip-container h4 {
-    margin: 0 0 0.5rem 0;
-    color: #0056b3;
-}
-
-#community-tip-text {
-    margin: 0;
-    font-style: italic;
-    color: #333;
-}
+/* Ensure the layout is a bit more compact for the form */
+.input-group input[type="text"] { flex-grow: 1; }
+.time-label { white-space: nowrap; }

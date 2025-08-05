@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meal Map</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/axe-core"></script>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -31,6 +32,7 @@
             <label for="breakfast">Breakfast:</label>
             <div class="input-group">
                 <input type="text" id="breakfast" placeholder="e.g., Oatmeal with berries" aria-label="Breakfast food">
+                <label for="breakfast-time" class="time-label">Time:</label>
                 <select id="breakfast-time" aria-label="Breakfast time">
                     <option value="">Select a time</option>
                     <option value="06:00">6:00 AM</option>
@@ -55,6 +57,7 @@
             <label for="lunch">Lunch:</label>
             <div class="input-group">
                 <input type="text" id="lunch" placeholder="e.g., Grilled chicken salad" aria-label="Lunch food">
+                <label for="lunch-time" class="time-label">Time:</label>
                 <select id="lunch-time" aria-label="Lunch time">
                     <option value="">Select a time</option>
                     <option value="11:00">11:00 AM</option>
@@ -77,6 +80,7 @@
             <label for="dinner">Dinner:</label>
             <div class="input-group">
                 <input type="text" id="dinner" placeholder="e.g., Salmon with roasted vegetables" aria-label="Dinner food">
+                <label for="dinner-time" class="time-label">Time:</label>
                 <select id="dinner-time" aria-label="Dinner time">
                     <option value="">Select a time</option>
                     <option value="17:00">5:00 PM</option>
@@ -104,15 +108,15 @@
             <div id="snacks-container" aria-live="polite">
                 <!-- Snack inputs will be added here -->
             </div>
-            <button type="button" id="add-snack-btn" aria-label="Add a new snack input field">+ Add Snack</button>
+            <button type="button" id="add-snack-btn" class="button button-secondary">+ Add Snack</button>
         </div>
 
-        <button id="analyze-btn" class="button-primary">Analyze My Day</button>
+        <button id="analyze-btn" class="button button-primary">Analyze My Day</button>
     </div>
 
     <div id="routine-generator" class="meal-input-container" aria-labelledby="routine-generator-heading">
         <h2 id="routine-generator-heading">Generate a Workout Routine</h2>
-        <button id="generate-routine-btn" class="button-secondary">Generate Muscle-Building Routine</button>
+        <button id="generate-routine-btn" class="button button-secondary">Generate Muscle-Building Routine</button>
         <div id="routine-output" class="hidden" aria-live="polite"></div>
     </div>
     
@@ -144,13 +148,13 @@
     <!-- NEW: Meal Plan & Actions -->
     <div id="meal-plan-container" class="meal-input-container" role="region" aria-labelledby="meal-plan-heading">
         <h2 id="meal-plan-heading">Meal Plan & Actions</h2>
-        <button id="generate-plan-btn" class="button-primary">Generate a 3-Day Meal Plan</button>
+        <button id="generate-plan-btn" class="button button-primary">Generate a 3-Day Meal Plan</button>
         <div id="meal-plan-output" class="hidden" aria-live="polite">
             <!-- Generated meal plan will be injected here -->
         </div>
         <div id="meal-plan-actions" class="hidden">
-             <button id="export-grocery-btn" class="button-secondary">Export to Grocery List</button>
-             <button id="find-meal-kits-btn" class="button-secondary">Find Meal Kits</button>
+             <button id="export-grocery-btn" class="button button-secondary">Export to Grocery List</button>
+             <button id="find-meal-kits-btn" class="button button-secondary">Find Meal Kits</button>
         </div>
     </div>
 
@@ -166,10 +170,10 @@
         <h2 id="history-heading">
             Meal History
             <div class="history-controls">
-                <label for="import-file" class="file-label button-secondary">Import</label>
+                <label for="import-file" class="button button-secondary">Import</label>
                 <input type="file" id="import-file" accept=".json" style="display: none;" aria-label="Import meal history from a JSON file">
-                <button id="export-btn" class="button-secondary">Export</button>
-                <button id="clear-history-btn" class="button-danger">Clear All</button>
+                <button id="export-btn" class="button button-secondary">Export</button>
+                <button id="clear-history-btn" class="button button-danger">Clear All</button>
             </div>
         </h2>
         <ul id="history-list" aria-live="polite">
