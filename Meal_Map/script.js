@@ -489,10 +489,12 @@ function renderHistory(history) { // Now accepts history as an argument
 
 // --- Data Persistence Layer (Replaced with API calls) ---
 
-const API_URL = 'http://localhost:3000/api/meals';
-const NUTRITION_API_URL = 'http://localhost:3000/api/calorieninjas';
-const QUESTS_API_URL = 'http://localhost:3000/api/quests';
-const TIPS_API_URL = 'http://localhost:3000/api/community-tips';
+const RENDER_URL = 'https://ai-native-journey-bp45.onrender.com';
+
+const API_URL = `${RENDER_URL}/api/meals`;
+const NUTRITION_API_URL = `${RENDER_URL}/api/calorieninjas`;
+const QUESTS_API_URL = `${RENDER_URL}/api/quests`;
+const TIPS_API_URL = `${RENDER_URL}/api/community-tips`;
 
 // Global variable to hold the history data
 let mealHistoryCache = [];
