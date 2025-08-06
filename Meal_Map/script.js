@@ -140,19 +140,33 @@ function clearInputs() {
     addSnackInput();
 }
 
-const FOOD_KEYWORDS = {
-    protein: ['chicken', 'beef', 'fish', 'salmon', 'tuna', 'eggs', 'tofu', 'lentils', 'beans', 'shrimp', 'scampi', 'bean', 'burgers'],
-    carbs: ['bread', 'pasta', 'rice', 'potatoes', 'oatmeal', 'cereal', 'bagel', 'noodles', 'buns', 'wheat'],
-    fats: ['avocado', 'nuts', 'seeds', 'olive oil', 'cheese'],
-    vegetables: ['salad', 'broccoli', 'spinach', 'carrots', 'peppers', 'onions', 'green beans', 'zucchini'],
-    fruits: ['apple', 'banana', 'berries', 'orange', 'grapes']
-};
+function getFoodKeywords() {
+    const lang = localStorage.getItem('language') || 'en';
+    if (lang === 'es') {
+        return {
+            protein: ['pollo', 'carne', 'pescado', 'salmón', 'atún', 'huevos', 'tofu', 'lentejas', 'frijoles', 'camarones', 'gambas', 'hamburguesas'],
+            carbs: ['pan', 'pasta', 'arroz', 'patatas', 'avena', 'cereal', 'bagel', 'fideos', 'bollos', 'trigo'],
+            fats: ['aguacate', 'nueces', 'semillas', 'aceite de oliva', 'queso'],
+            vegetables: ['ensalada', 'brócoli', 'espinacas', 'zanahorias', 'pimientos', 'cebollas', 'judías verdes', 'calabacín'],
+            fruits: ['manzana', 'plátano', 'bayas', 'naranja', 'uvas']
+        };
+    }
+    // Default to English
+    return {
+        protein: ['chicken', 'beef', 'fish', 'salmon', 'tuna', 'eggs', 'tofu', 'lentils', 'beans', 'shrimp', 'scampi', 'bean', 'burgers'],
+        carbs: ['bread', 'pasta', 'rice', 'potatoes', 'oatmeal', 'cereal', 'bagel', 'noodles', 'buns', 'wheat'],
+        fats: ['avocado', 'nuts', 'seeds', 'olive oil', 'cheese'],
+        vegetables: ['salad', 'broccoli', 'spinach', 'carrots', 'peppers', 'onions', 'green beans', 'zucchini'],
+        fruits: ['apple', 'banana', 'berries', 'orange', 'grapes']
+    };
+}
 
 function analyzeDay(mealData) {
     const allFoods = [mealData.breakfast.food, mealData.lunch.food, mealData.dinner.food, ...mealData.snacks.map(s => s.food)].join(' ').toLowerCase();
+    const keywords = getFoodKeywords();
     let macroCounts = { protein: 0, carbs: 0, fats: 0, vegetables: 0, fruits: 0 };
-    for (const macro in FOOD_KEYWORDS) {
-        for (const keyword of FOOD_KEYWORDS[macro]) {
+    for (const macro in keywords) {
+        for (const keyword of keywords[macro]) {
             if (allFoods.includes(keyword)) macroCounts[macro]++;
         }
     }
@@ -160,10 +174,12 @@ function analyzeDay(mealData) {
 }
 
 function generatePersonalizedSuggestions(history) {
-    if (history.length < 3) return ["Keep logging for a few more days to unlock personalized suggestions!"];
+    if (history.length < 3) return [getTranslation("suggestion_keepLogging")];
+    
     const suggestions = new Set();
     const allFoods = [];
     let energizedMeals = [];
+
     history.forEach(day => {
         ['breakfast', 'lunch', 'dinner'].forEach(mealType => {
             const meal = day[mealType];
@@ -173,33 +189,46 @@ function generatePersonalizedSuggestions(history) {
             }
         });
     });
+
     if (energizedMeals.length > 0) {
         const favoriteEnergizingMeal = energizedMeals.reduce((a, b) => (energizedMeals.filter(v => v.meal === a.meal).length >= energizedMeals.filter(v => v.meal === b.meal).length) ? a : b);
-        if (favoriteEnergizingMeal) suggestions.add(`You often feel energized after eating ${favoriteEnergizingMeal.meal}. Consider having it for ${favoriteEnergizingMeal.type} again soon!`);
+        if (favoriteEnergizingMeal) {
+            suggestions.add(getTranslation("suggestion_energized", { meal: favoriteEnergizingMeal.meal, type: getTranslation(favoriteEnergizingMeal.type) }));
+        }
     }
+
     const foodVariety = new Set(allFoods).size;
     if (allFoods.length > 5 && foodVariety / allFoods.length < 0.5) {
-        suggestions.add("You have a consistent routine. Try introducing a new vegetable or protein this week to diversify your nutrients.");
+        suggestions.add(getTranslation("suggestion_routine"));
     }
+
     const todayLog = history.reduce((latest, current) => new Date(current.date) > new Date(latest.date) ? current : latest);
-    if (todayLog.waterIntake < 6) suggestions.add(`You logged ${todayLog.waterIntake || 0} glasses of water today. Aim for at least 6-8 glasses.`);
+    if (todayLog.waterIntake < 6) {
+        suggestions.add(getTranslation("suggestion_water", { waterIntake: todayLog.waterIntake || 0 }));
+    }
+
     if (todayLog.dinner.time) {
         const dinnerHour = parseInt(todayLog.dinner.time.split(':')[0], 10);
-        if (dinnerHour >= 21) suggestions.add('Eating dinner late may affect sleep quality. Consider an earlier mealtime.');
+        if (dinnerHour >= 21) suggestions.add(getTranslation("suggestion_lateDinner"));
     }
-    return suggestions.size > 0 ? Array.from(suggestions) : ["Your diet seems balanced today. Keep up the great work!"];
+
+    return suggestions.size > 0 ? Array.from(suggestions) : [getTranslation("suggestion_balanced")];
 }
 
 function displayCommunityTip(suggestions, tips) {
     const tipContainer = document.getElementById('community-tip-container');
     const tipText = document.getElementById('community-tip-text');
     let relevantTips = [];
+    const keywords = getFoodKeywords();
+
     suggestions.forEach(suggestion => {
-        if (suggestion.includes('protein')) relevantTips.push(...(tips.protein || []));
-        if (suggestion.includes('vegetables')) relevantTips.push(...(tips.vegetables || []));
-        if (suggestion.includes('water')) relevantTips.push(...(tips.water || []));
+        if (suggestion.includes(keywords.protein[0])) relevantTips.push(...(tips.protein || []));
+        if (suggestion.includes(keywords.vegetables[0])) relevantTips.push(...(tips.vegetables || []));
+        if (suggestion.includes(getTranslation('history_water').toLowerCase())) relevantTips.push(...(tips.water || []));
     });
+
     if (relevantTips.length === 0) relevantTips = tips.general || [];
+    
     if (relevantTips.length > 0) {
         tipText.textContent = relevantTips[Math.floor(Math.random() * relevantTips.length)];
         tipContainer.classList.remove('hidden');
@@ -212,7 +241,7 @@ function displayDailyAnalysis(suggestions, tips) {
     const suggestionsEl = document.getElementById('suggestions');
     suggestionsEl.innerHTML = '';
     if (suggestions.length === 0) {
-        suggestionsEl.innerHTML = '<li>Your diet seems balanced today. Keep up the great work!</li>';
+        suggestionsEl.innerHTML = `<li>${getTranslation("suggestion_balanced")}</li>`;
         document.getElementById('community-tip-container').classList.add('hidden');
     } else {
         suggestions.forEach(s => {
@@ -270,21 +299,27 @@ function generateWeeklySummary(history) {
 
 function displayWeeklySummary(summary) {
     const summaryEl = document.getElementById('weekly-summary');
-    const rhythmExplanation = summary.rhythmScore > 80 ? "Fantastic! Your meal times are very consistent." :
-                              summary.rhythmScore > 60 ? "Good job. Your meal schedule is fairly regular." :
-                              "Try to eat your meals at more consistent times for better energy levels.";
+    let rhythmExplanation;
+    if (summary.rhythmScore > 80) {
+        rhythmExplanation = getTranslation('summary_rhythm_great');
+    } else if (summary.rhythmScore > 60) {
+        rhythmExplanation = getTranslation('summary_rhythm_good');
+    } else {
+        rhythmExplanation = getTranslation('summary_rhythm_improvement');
+    }
+
     summaryEl.innerHTML = `
         <div class="summary-metric">
             <span class="metric-value">${summary.rhythmScore}</span>
-            <span class="metric-label">Meal Rhythm Score</span>
+            <span class="metric-label">${getTranslation('summary_rhythm_score')}</span>
             <p class="metric-explanation">${rhythmExplanation}</p>
         </div>
         <div class="summary-details">
-            <p>Over the last ${summary.totalDays} days:</p>
+            <p>${getTranslation('summary_overLastDays', { totalDays: summary.totalDays })}</p>
             <ul>
-                <li>You had a late dinner on <strong>${summary.lateDinners}</strong> day(s).</li>
-                <li>You skipped breakfast on <strong>${summary.skippedBreakfasts}</strong> day(s).</li>
-                <li>You felt energized after <strong>${summary.energizedMeals}</strong> meal(s) and sluggish after <strong>${summary.sluggishMeals}</strong>.</li>
+                <li>${getTranslation('summary_lateDinners', { lateDinners: summary.lateDinners })}</li>
+                <li>${getTranslation('summary_skippedBreakfasts', { skippedBreakfasts: summary.skippedBreakfasts })}</li>
+                <li>${getTranslation('summary_moods', { energizedMeals: summary.energizedMeals, sluggishMeals: summary.sluggishMeals })}</li>
             </ul>
         </div>
     `;
@@ -295,12 +330,21 @@ let macroChartInstance = null;
 function renderMacroChart(macroData) {
     const ctx = document.getElementById('macro-chart').getContext('2d');
     if (macroChartInstance) macroChartInstance.destroy();
+    
+    const labels = [
+        getTranslation('chart_protein'),
+        getTranslation('chart_carbs'),
+        getTranslation('chart_fats'),
+        getTranslation('chart_vegetables'),
+        getTranslation('chart_fruits')
+    ];
+
     macroChartInstance = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Protein', 'Carbs', 'Fats', 'Vegetables', 'Fruits'],
+            labels: labels,
             datasets: [{
-                label: 'Food Groups',
+                label: getTranslation('chart_foodGroups'),
                 data: [macroData.protein, macroData.carbs, macroData.fats, macroData.vegetables, macroData.fruits],
                 backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF']
             }]
@@ -309,7 +353,7 @@ function renderMacroChart(macroData) {
             responsive: true,
             plugins: {
                 legend: { position: 'top' },
-                title: { display: true, text: 'Today\'s Food Group Distribution' }
+                title: { display: true, text: getTranslation('macroChartTitle') }
             }
         }
     });
@@ -355,16 +399,16 @@ async function saveMealHistory(newMealData) {
                         carbs: Math.round(item.carbohydrates_total_g)
                     };
                 } else {
-                    alert(`Could not find nutrition data for "${meal.food}".`);
+                    alert(getTranslation('couldNotFindNutritionData', { food: meal.food }));
                     meal.nutrition = {};
                 }
             } else {
                 const errorData = await response.json().catch(() => ({}));
-                alert(`Could not fetch nutrition data for "${meal.food}". Reason: ${errorData.error || response.statusText}`);
+                alert(getTranslation('couldNotFetchNutritionData', { food: meal.food, reason: errorData.error || response.statusText }));
             }
         } catch (networkError) {
             console.error('Network error fetching nutrition data:', networkError);
-            alert(`Failed to connect to the backend server for nutrition data.`);
+            alert(getTranslation('failedToConnectNutrition'));
         }
     };
     const dataPromises = [
@@ -482,7 +526,7 @@ function renderHistory(history) {
     const historyList = document.getElementById('history-list');
     historyList.innerHTML = '';
     if (history.length === 0) {
-        historyList.innerHTML = '<li>No meal history yet.</li>';
+        historyList.innerHTML = `<li>${getTranslation('noMealHistory')}</li>`;
         return;
     }
     history.forEach(meal => {
@@ -494,17 +538,22 @@ function renderHistory(history) {
         header.textContent = meal.date;
         const mealInfo = document.createElement('div');
         mealInfo.className = 'meal-info';
-        const snacksHtml = (meal.snacks && meal.snacks.length > 0) ? meal.snacks.map(s => `<p><strong>Snack:</strong> ${s.food}</p>${formatNutrition(s.nutrition)}`).join('') : '<p><strong>Snacks:</strong> None</p>';
+
+        const snacksHtml = (meal.snacks && meal.snacks.length > 0) 
+            ? meal.snacks.map(s => `<p><strong>${getTranslation('history_snack')}:</strong> ${s.food}</p>${formatNutrition(s.nutrition)}`).join('') 
+            : `<p><strong>${getTranslation('history_snacks')}:</strong> ${getTranslation('history_noSnacks')}</p>`;
+        
         mealInfo.innerHTML = `
-            <p><strong>Breakfast:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (Mood: ${meal.breakfast.mood})</p>${formatNutrition(meal.breakfast.nutrition)}
-            <p><strong>Lunch:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (Mood: ${meal.lunch.mood})</p>${formatNutrition(meal.lunch.nutrition)}
-            <p><strong>Dinner:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (Mood: ${meal.dinner.mood})</p>${formatNutrition(meal.dinner.nutrition)}
+            <p><strong>${getTranslation('breakfast')}:</strong> ${meal.breakfast.food || 'N/A'} at ${meal.breakfast.time || 'N/A'} (${getTranslation('history_mood')}: ${getTranslation(meal.breakfast.mood) || 'N/A'})</p>${formatNutrition(meal.breakfast.nutrition)}
+            <p><strong>${getTranslation('lunch')}:</strong> ${meal.lunch.food || 'N/A'} at ${meal.lunch.time || 'N/A'} (${getTranslation('history_mood')}: ${getTranslation(meal.lunch.mood) || 'N/A'})</p>${formatNutrition(meal.lunch.nutrition)}
+            <p><strong>${getTranslation('dinner')}:</strong> ${meal.dinner.food || 'N/A'} at ${meal.dinner.time || 'N/A'} (${getTranslation('history_mood')}: ${getTranslation(meal.dinner.mood) || 'N/A'})</p>${formatNutrition(meal.dinner.nutrition)}
             ${snacksHtml}
-            <p><strong>Water:</strong> ${meal.waterIntake || 0} glasses</p>
+            <p><strong>${getTranslation('history_water')}:</strong> ${meal.waterIntake || 0} ${getTranslation('history_glasses')}</p>
         `;
         const actions = document.createElement('div');
         actions.className = 'actions';
-        actions.innerHTML = `<button onclick="editMeal(${meal.id})">Edit</button><button onclick="deleteMeal(${meal.id})" class="delete">Delete</button>`;
+        actions.innerHTML = `<button onclick="editMeal(${meal.id})">${getTranslation('edit')}</button><button onclick="deleteMeal(${meal.id})" class="delete">${getTranslation('delete')}</button>`;
+        
         card.appendChild(header);
         card.appendChild(mealInfo);
         card.appendChild(actions);
@@ -519,7 +568,9 @@ function formatNutrition(nutrition) {
 
 function checkQuestProgress(history, quests) {
     const progress = { hydrate: 0, earlyBird: 0, rainbow: new Set() };
+    const keywords = getFoodKeywords(); // Use translated keywords
     let consecutiveHydrationDays = 0;
+
     for (const day of history) {
         if (day.waterIntake >= 8) {
             consecutiveHydrationDays++;
@@ -527,16 +578,19 @@ function checkQuestProgress(history, quests) {
             consecutiveHydrationDays = 0;
         }
         progress.hydrate = Math.max(progress.hydrate, consecutiveHydrationDays);
+
         if (day.breakfast.time && new Date(`1970-01-01T${day.breakfast.time}`).getHours() < 9) {
             progress.earlyBird++;
         }
+
         if (history.indexOf(day) < 7) {
             const allFoods = [day.breakfast.food, day.lunch.food, day.dinner.food, ...day.snacks.map(s => s.food)].join(' ').toLowerCase();
-            FOOD_KEYWORDS.vegetables.forEach(veg => {
+            keywords.vegetables.forEach(veg => { // Check against translated vegetable keywords
                 if (allFoods.includes(veg)) progress.rainbow.add(veg);
             });
         }
     }
+
     return {
         hydrate: progress.hydrate,
         earlyBird: Math.min(progress.earlyBird, quests.earlyBird.goal),
@@ -548,15 +602,21 @@ function displayQuests(history, quests) {
     const progress = checkQuestProgress(history, quests);
     const questsOutput = document.getElementById('quests-output');
     let html = '';
+
     for (const key in quests) {
         const quest = quests[key];
         const currentProgress = progress[key];
         const percentage = Math.min((currentProgress / quest.goal) * 100, 100);
+        
+        // Use translation keys for title and description
+        const title = getTranslation(`quest_${key}_title`);
+        const description = getTranslation(`quest_${key}_description`);
+
         html += `
             <div class="quest-card ${percentage === 100 ? 'completed' : ''}">
                 <div class="quest-info">
-                    <h4>${quest.title} ${percentage === 100 ? '🏆' : ''}</h4>
-                    <p>${quest.description}</p>
+                    <h4>${title} ${percentage === 100 ? '🏆' : ''}</h4>
+                    <p>${description}</p>
                 </div>
                 <div class="quest-progress">
                     <div class="progress-bar-container"><div class="progress-bar" style="width: ${percentage}%;"></div></div>
@@ -571,12 +631,39 @@ function displayQuests(history, quests) {
 
 function generateMuscleRoutine() {
     const routine = {
-        title: "3-Day Muscle-Building Split (Push/Pull/Legs)",
-        description: "This routine is designed to maximize muscle growth by targeting all major muscle groups over three days. Rest for 60-90 seconds between sets. Aim for progressive overload by increasing weight or reps over time.",
+        title: getTranslation("routineTitle"),
+        description: getTranslation("routineDescription"),
         days: [
-            { day: "Day 1: Push (Chest, Shoulders, Triceps)", exercises: ["Bench Press: 3 sets of 5-8 reps", "Overhead Press: 3 sets of 8-12 reps", "Incline Dumbbell Press: 3 sets of 8-12 reps", "Lateral Raises: 3 sets of 12-15 reps", "Tricep Pushdowns: 3 sets of 10-15 reps"] },
-            { day: "Day 2: Pull (Back, Biceps)", exercises: ["Pull-Ups or Lat Pulldowns: 3 sets of 8-12 reps", "Barbell Rows: 3 sets of 8-12 reps", "Face Pulls: 3 sets of 15-20 reps", "Bicep Curls: 3 sets of 10-15 reps", "Hammer Curls: 3 sets of 10-15 reps"] },
-            { day: "Day 3: Legs (Quads, Hamstrings, Calves)", exercises: ["Squats: 3 sets of 5-8 reps", "Romanian Deadlifts: 3 sets of 8-12 reps", "Leg Press: 3 sets of 10-15 reps", "Leg Curls: 3 sets of 12-15 reps", "Calf Raises: 4 sets of 15-20 reps"] }
+            { 
+                day: getTranslation("pushDay"), 
+                exercises: [
+                    getTranslation("benchPress"), 
+                    getTranslation("overheadPress"), 
+                    getTranslation("inclinePress"), 
+                    getTranslation("lateralRaises"), 
+                    getTranslation("tricepPushdowns")
+                ] 
+            },
+            { 
+                day: getTranslation("pullDay"), 
+                exercises: [
+                    getTranslation("pullUps"), 
+                    getTranslation("barbellRows"), 
+                    getTranslation("facePulls"), 
+                    getTranslation("bicepCurls"), 
+                    getTranslation("hammerCurls")
+                ] 
+            },
+            { 
+                day: getTranslation("legDay"), 
+                exercises: [
+                    getTranslation("squats"), 
+                    getTranslation("romanianDeadlifts"), 
+                    getTranslation("legPress"), 
+                    getTranslation("legCurls"), 
+                    getTranslation("calfRaises")
+                ] 
+            }
         ]
     };
     const outputContainer = document.getElementById('routine-output');
@@ -593,33 +680,39 @@ function generateMuscleRoutine() {
 }
 
 const DIVERSE_MEAL_IDEAS = {
-    breakfast: ["Greek Yogurt with Honey and Nuts", "Avocado Toast with a Poached Egg", "Smoothie with Spinach, Banana, and Protein Powder", "Whole Wheat Pancakes with Berries", "Breakfast Burrito with Black Beans and Salsa"],
-    lunch: ["Lentil Soup with a side of Whole Wheat Bread", "Turkey and Avocado Wrap", "Mason Jar Salad with Chickpeas and a Vinaigrette", "Leftover Salmon with Roasted Asparagus", "Caprese Salad with Fresh Mozzarella, Tomatoes, and Basil"],
-    dinner: ["Sheet Pan Lemon Herb Chicken with Potatoes and Green Beans", "Black Bean Burgers on Whole Wheat Buns", "Shrimp Scampi with Zucchini Noodles", "Vegetable Stir-fry with Tofu and Brown Rice", "Stuffed Bell Peppers with Quinoa and Ground Turkey"]
+    breakfast: ["mealIdea_Yogurt", "mealIdea_AvocadoToast", "mealIdea_Smoothie", "mealIdea_Pancakes", "mealIdea_Burrito"],
+    lunch: ["mealIdea_LentilSoup", "mealIdea_TurkeyWrap", "mealIdea_MasonJarSalad", "mealIdea_LeftoverSalmon", "mealIdea_CapreseSalad"],
+    dinner: ["mealIdea_SheetPanChicken", "mealIdea_BlackBeanBurgers", "mealIdea_ShrimpScampi", "mealIdea_VegetableStirFry", "mealIdea_StuffedPeppers"]
 };
 
 function createMealPlan(history) {
     if (!history || history.length < 3) return null;
+    
     const getFavoriteMeal = (mealType) => {
         const meals = history.map(day => day[mealType]).filter(meal => meal && meal.food && meal.mood === 'energized').map(meal => meal.food.toLowerCase());
         if (meals.length === 0) return null;
         return meals.reduce((a, b, i, arr) => (arr.filter(v => v === a).length >= arr.filter(v => v === b).length) ? a : b, null);
     };
+
     const usedMeals = new Set();
     const getUniqueMeal = (mealType, favorite) => {
-        let meal;
+        let mealKey;
         if (favorite && !usedMeals.has(favorite) && Math.random() < 0.5) {
-            meal = favorite;
+            // This is tricky because the favorite is a string, not a key. We won't translate favorites for now.
+            usedMeals.add(favorite);
+            return favorite; 
         } else {
             const mealOptions = DIVERSE_MEAL_IDEAS[mealType];
             do {
-                meal = mealOptions[Math.floor(Math.random() * mealOptions.length)];
-            } while (usedMeals.has(meal));
+                mealKey = mealOptions[Math.floor(Math.random() * mealOptions.length)];
+            } while (usedMeals.has(mealKey));
         }
-        usedMeals.add(meal);
-        return meal;
+        usedMeals.add(mealKey);
+        return getTranslation(mealKey); // Translate the key to a meal string
     };
+
     const favorites = { breakfast: getFavoriteMeal('breakfast'), lunch: getFavoriteMeal('lunch'), dinner: getFavoriteMeal('dinner') };
+    
     return {
         day1: { breakfast: getUniqueMeal('breakfast', favorites.breakfast), lunch: getUniqueMeal('lunch', favorites.lunch), dinner: getUniqueMeal('dinner', favorites.dinner) },
         day2: { breakfast: getUniqueMeal('breakfast', favorites.breakfast), lunch: getUniqueMeal('lunch', favorites.lunch), dinner: getUniqueMeal('dinner', favorites.dinner) },
@@ -640,11 +733,14 @@ async function generateMealPlan() {
 function displayMealPlan(plan) {
     currentMealPlan = plan;
     const planOutput = document.getElementById('meal-plan-output');
-    let html = '<h3>Your 3-Day Plan</h3>';
-    for (const day in plan) {
-        html += `<div class="meal-plan-day"><h4>${day.charAt(0).toUpperCase() + day.slice(1)}</h4><ul>`;
-        for (const mealType in plan[day]) {
-            html += `<li><strong>${mealType.charAt(0).toUpperCase() + mealType.slice(1)}:</strong> ${plan[day][mealType]}</li>`;
+    let html = `<h3>${getTranslation('your3DayPlan')}</h3>`;
+    const dayKeys = { day1: 'day1', day2: 'day2', day3: 'day3' };
+
+    for (const dayKey in plan) {
+        const dayNum = dayKeys[dayKey];
+        html += `<div class="meal-plan-day"><h4>${getTranslation(dayNum)}</h4><ul>`;
+        for (const mealType in plan[dayKey]) {
+            html += `<li><strong>${getTranslation(mealType)}:</strong> ${plan[dayKey][mealType]}</li>`;
         }
         html += '</ul></div>';
     }
@@ -655,21 +751,26 @@ function displayMealPlan(plan) {
 
 function exportToGrocery(plan) {
     const ingredients = new Set();
+    const keywords = getFoodKeywords();
+    const allKeywords = Object.values(keywords).flat();
+
     Object.values(plan).forEach(day => {
         Object.values(day).forEach(meal => {
-            meal.split(' ').forEach(word => {
-                const cleanedWord = word.replace(/,$/, '').toLowerCase();
-                if (Object.values(FOOD_KEYWORDS).flat().includes(cleanedWord)) {
+            // Since meal plans can be in English even when the UI is Spanish, check both sets of keywords
+            const mealWords = meal.toLowerCase().split(' ');
+            mealWords.forEach(word => {
+                const cleanedWord = word.replace(/,$/, '');
+                if (allKeywords.includes(cleanedWord)) {
                     ingredients.add(cleanedWord);
                 }
             });
         });
     });
-    let fileContent = "Your Meal Map Grocery List\n\n-------------------------\n\n";
+    let fileContent = `${getTranslation('groceryListTitle')}\n\n-------------------------\n\n`;
     if (ingredients.size > 0) {
         fileContent += Array.from(ingredients).map(item => `- ${item.charAt(0).toUpperCase() + item.slice(1)}`).join('\n');
     } else {
-        fileContent += "No specific ingredients found in your meal plan.";
+        fileContent += getTranslation('noIngredients');
     }
     const blob = new Blob([fileContent], { type: 'text/plain;charset=utf-8' });
     const link = document.createElement('a');
@@ -682,7 +783,8 @@ function exportToGrocery(plan) {
 
 function findMealKits(plan) {
     const mainDinner = plan.day1.dinner || "healthy dinner";
-    const allKeywords = Object.values(FOOD_KEYWORDS).flat();
+    const keywords = getFoodKeywords();
+    const allKeywords = Object.values(keywords).flat();
     const searchTerms = mainDinner.toLowerCase().split(' ').filter(word => allKeywords.includes(word.replace(/,$/, '')));
     const searchQuery = searchTerms.length > 0 ? searchTerms.join(' ') : mainDinner;
     const url = `https://www.hellofresh.com/recipes/search?q=${encodeURIComponent(searchQuery)}`;
