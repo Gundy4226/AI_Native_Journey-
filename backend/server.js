@@ -65,47 +65,7 @@ app.post('/api/calorieninjas', async (req, res) => {
     }
 });
 
-// NEW: Endpoint to get a food image from Spoonacular
-app.get('/api/food-image', async (req, res) => {
-    const { query } = req.query;
-    if (!query) {
-        return res.status(400).json({ error: 'Query is required.' });
-    }
 
-    try {
-        const response = await axios.get('https://api.spoonacular.com/recipes/complexSearch', {
-            params: {
-                query: query,
-                number: 1, // We only need one result
-                apiKey: process.env.SPOONACULAR_API_KEY
-            }
-        });
-
-        if (response.data.results && response.data.results.length > 0) {
-            res.json({ imageUrl: response.data.results[0].image });
-        } else {
-            res.status(404).json({ error: 'No image found for this food.' });
-        }
-    } catch (error) {
-        console.error('--- SPOONACULAR API ERROR ---');
-        if (error.response) {
-            // The request was made and the server responded with a status code
-            // that falls out of the range of 2xx
-            console.error('Data:', error.response.data);
-            console.error('Status:', error.response.status);
-            console.error('Headers:', error.response.headers);
-        } else if (error.request) {
-            // The request was made but no response was received
-            console.error('Request:', error.request);
-        } else {
-            // Something happened in setting up the request that triggered an Error
-            console.error('Error Message:', error.message);
-        }
-        console.error('Config:', error.config);
-        console.error('--- END SPOONACULAR API ERROR ---');
-        res.status(500).json({ error: 'Failed to fetch data from Spoonacular.' });
-    }
-});
 
 
 // GET /api/meals - Retrieve all meal entries
