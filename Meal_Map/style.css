@@ -1,182 +1,227 @@
-/* --- General --- */
+/* style.css */
+
 :root {
-    --primary-color: #4CAF50; /* A fresh green */
-    --primary-hover: #45a049;
-    --secondary-color: #f4f4f4;
-    --text-color: #333;
-    --light-text-color: #f8f8f8;
-    --border-color: #ddd;
-    --shadow-color: rgba(0, 0, 0, 0.1);
-    --danger-color: #f44336;
-    --danger-hover: #e53935;
+    --bg-color: #f4f6f8;
+    --card-bg-color: #ffffff;
+    --primary-accent-color: #e8f5e9; /* A very light, calm green */
+    --secondary-accent-color: #f1f8e9; /* A lighter, yellowish green */
+    --text-primary-color: #333333;
+    --text-secondary-color: #666666;
+    --border-color: #e0e0e0;
+    --button-primary-bg: #333333;
+    --button-primary-text: #ffffff;
+    --shadow-color: rgba(0, 0, 0, 0.05);
+    --font-family: 'Roboto', sans-serif;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
+/* --- Base & Typography --- */
 body {
-    font-family: 'Roboto', sans-serif; /* New font */
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+    font-family: var(--font-family);
+    background-color: var(--bg-color);
+    color: var(--text-primary-color);
     line-height: 1.6;
     margin: 0;
     padding: 20px;
-    padding-top: 80px;
+    position: relative; /* Needed for pseudo-element positioning */
 }
 
-/* --- Navbar --- */
-.navbar {
-    background: #fff;
-    padding: 1rem 2rem;
-    box-shadow: 0 2px 5px var(--shadow-color);
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    gap: 2rem;
+body::before {
+    content: '';
+    position: absolute;
+    top: -50px;
+    left: -80px;
+    width: 250px; 
+    height: 250px;
+    background-image: url('lettuce.png');
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.5;
+    z-index: -1; /* Place it behind the content */
+    transform: rotate(-25deg);
 }
 
-.nav-link {
-    color: var(--primary-color);
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1rem;
-    padding: 5px 10px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
+h1, h2, h3 {
+    margin: 0 0 1rem 0;
+    font-weight: 700;
 }
 
-.nav-link:hover, .nav-link:focus {
-    background-color: var(--primary-color);
-    color: #fff;
-}
-
-/* --- Container & Cards --- */
-.container {
-    background: #fff;
-    padding: 2.5rem;
-    border-radius: 12px;
-    box-shadow: 0 0 25px var(--shadow-color);
-    width: 100%;
-    max-width: 700px;
-}
-
-.meal-input-container {
-    margin-bottom: 2.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
-}
-.meal-input-container:last-of-type {
-    border-bottom: none;
-}
-
-/* --- Typography --- */
-h1, h2, h3, h4 {
-    color: var(--primary-color);
-    text-align: center;
-}
 h1 {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
+    text-align: center;
+    margin-bottom: 2rem;
 }
+
 h2 {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    color: var(--text-primary-color);
+    margin-bottom: 1.5rem;
 }
 
-/* --- Forms & Buttons --- */
-.meal-entry label {
+label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-secondary-color);
+    font-size: 0.9rem;
 }
 
-.input-group {
-    display: flex;
-    gap: 15px;
-    align-items: center;
+/* --- Layout --- */
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.card {
+    background-color: var(--card-bg-color);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 10px 30px var(--shadow-color);
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+/* --- Forms & Inputs --- */
+.input-group, .meal-entry {
+    margin-bottom: 1.5rem;
 }
 
 input[type="text"],
 input[type="number"],
 select {
     width: 100%;
-    padding: 12px;
+    padding: 14px;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
+    border-radius: 12px;
+    background-color: var(--bg-color);
     font-size: 1rem;
+    color: var(--text-primary-color);
+    box-sizing: border-box; /* Ensures padding doesn't affect width */
 }
 
+input::placeholder {
+    color: #999;
+}
+
+.meal-input-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.meal-input-group > input[type="text"] {
+    flex: 1 1 200px; /* Grow and shrink, base width 200px */
+}
+.meal-input-group > select {
+    flex: 1 1 120px;
+}
+
+/* --- Buttons --- */
 .button {
     display: inline-block;
-    padding: 12px 20px;
+    padding: 14px 28px;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     cursor: pointer;
     font-size: 1rem;
-    font-weight: bold;
+    font-weight: 700;
     text-align: center;
-    transition: background-color 0.3s, transform 0.2s;
+    transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
+
 .button:hover, .button:focus {
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 .button-primary {
-    background-color: var(--primary-color);
-    color: var(--light-text-color);
-    width: 100%;
-    margin-top: 1rem;
-}
-.button-primary:hover, .button-primary:focus {
-    background-color: var(--primary-hover);
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
 }
 
 .button-secondary {
-    background-color: #6c757d;
-    color: var(--light-text-color);
-}
-.button-secondary:hover, .button-secondary:focus {
-    background-color: #5a6268;
+    background-color: var(--primary-accent-color);
+    color: var(--text-primary-color);
 }
 
 .button-danger {
-    background-color: var(--danger-color);
-    color: var(--light-text-color);
-}
-.button-danger:hover, .button-danger:focus {
-    background-color: var(--danger-hover);
+    background-color: #ffebee;
+    color: #c62828;
 }
 
 #add-snack-btn {
-    padding: 8px 12px;
+    width: auto;
+    padding: 8px 16px;
     font-size: 0.9rem;
-    margin-top: 5px;
+    margin-top: 0.5rem;
 }
 
-/* --- History & Analysis --- */
-.meal-card {
-    background: #fdfdfd;
-    padding: 1.5rem;
+/* --- Specific Sections --- */
+#history-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.history-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.history-controls .button {
+    width: auto;
+}
+
+#history-list .meal-card {
+    background-color: #fafafa;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
     margin-bottom: 1rem;
 }
 
-.quest-card {
-    background-color: #fff;
-    border-left: 5px solid var(--primary-color);
+.food-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin-bottom: 1rem;
 }
 
-#suggestions li {
-    background-color: #f9f9f9;
-    padding: 10px;
-    border-radius: 5px;
+.meal-images-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
-/* Accessibility */
+.meal-image-wrapper {
+    flex: 1;
+    min-width: 0;
+}
+
+.meal-image-wrapper img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.meal-image-wrapper p {
+    font-weight: bold;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+#meal-plan-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.hidden {
+    display: none;
+}
+
+/* --- Accessibility --- */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -190,6 +235,7 @@ select {
 }
 
 .skip-link:focus {
+    position: absolute;
     top: 10px;
     left: 10px;
     background: #000;
@@ -198,6 +244,41 @@ select {
     z-index: 1001;
 }
 
-/* Ensure the layout is a bit more compact for the form */
-.input-group input[type="text"] { flex-grow: 1; }
-.time-label { white-space: nowrap; }
+.main-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 20px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+#language-switcher {
+    background-color: var(--card-bg-color);
+    border-radius: 16px;
+    padding: 8px;
+    display: inline-flex;
+    gap: 4px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+#language-switcher button {
+    background: none;
+    border: 2px solid transparent;
+    color: var(--text-secondary-color);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 8px 12px;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+#language-switcher button:hover {
+    background-color: var(--primary-accent-color);
+}
+
+#language-switcher button.lang-active {
+    background-color: var(--button-primary-bg);
+    color: var(--button-primary-text);
+    border-color: var(--button-primary-bg);
+}
