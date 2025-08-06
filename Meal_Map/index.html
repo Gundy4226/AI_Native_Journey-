@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title data-i18n-key="title">Meal Map</title>
+    <title>Meal Map</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
@@ -13,125 +13,120 @@
 <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
-    <header class="main-header">
-        <div id="language-switcher">
-            <button data-lang="en" class="lang-active">English</button>
-            <button data-lang="es">Español</button>
-        </div>
-    </header>
+
 
     <div id="main-content" class="container">
-        <h1 data-i18n-key="title">Meal Map</h1>
+        <h1>Meal Map</h1>
 
         <!-- Meal Logger Card -->
         <div id="meal-logger" class="card" aria-labelledby="meal-logger-heading">
-            <h2 id="meal-logger-heading" data-i18n-key="logYourDailyIntake">Log Your Daily Intake</h2>
+            <h2 id="meal-logger-heading">Log Your Daily Intake</h2>
 
             <div class="meal-entry">
-                <label for="water-intake" data-i18n-key="waterIntake">Water Intake (glasses)</label>
-                <input type="number" id="water-intake" min="0" data-i18n-placeholder="waterIntakePlaceholder" aria-label="Water intake in glasses">
+                <label for="water-intake">Water Intake (glasses)</label>
+                <input type="number" id="water-intake" min="0" placeholder="e.g., 8" aria-label="Water intake in glasses">
             </div>
 
             <!-- Meal Entries -->
             <div class="meal-entry">
-                <label for="breakfast" data-i18n-key="breakfast">Breakfast</label>
+                <label for="breakfast">Breakfast</label>
                 <div class="meal-input-group">
-                    <input type="text" id="breakfast" data-i18n-placeholder="breakfastPlaceholder" aria-label="Breakfast food">
+                    <input type="text" id="breakfast" placeholder="e.g., Oatmeal with berries" aria-label="Breakfast food">
                     <select id="breakfast-time" aria-label="Breakfast time">
                         <!-- Options populated by script.js -->
                     </select>
                     <select id="breakfast-mood" aria-label="How you felt after breakfast">
-                        <option value="none" selected disabled data-i18n-key="howDidItFeel">How did it feel?</option>
-                        <option value="energized" data-i18n-key="energized">Energized</option>
-                        <option value="satisfied" data-i18n-key="satisfied">Satisfied</option>
-                        <option value="sluggish" data-i18n-key="sluggish">Sluggish</option>
+                        <option value="none" selected disabled>How did it feel?</option>
+                        <option value="energized">Energized</option>
+                        <option value="satisfied">Satisfied</option>
+                        <option value="sluggish">Sluggish</option>
                     </select>
                 </div>
             </div>
              <div class="meal-entry">
-                <label for="lunch" data-i18n-key="lunch">Lunch</label>
+                <label for="lunch">Lunch</label>
                 <div class="meal-input-group">
-                    <input type="text" id="lunch" data-i18n-placeholder="lunchPlaceholder" aria-label="Lunch food">
+                    <input type="text" id="lunch" placeholder="e.g., Grilled chicken salad" aria-label="Lunch food">
                     <select id="lunch-time" aria-label="Lunch time">
                         <!-- Options populated by script.js -->
                     </select>
                     <select id="lunch-mood" aria-label="How you felt after lunch">
-                        <option value="none" selected disabled data-i18n-key="howDidItFeel">How did it feel?</option>
-                        <option value="energized" data-i18n-key="energized">Energized</option>
-                        <option value="satisfied" data-i18n-key="satisfied">Satisfied</option>
-                        <option value="sluggish" data-i18n-key="sluggish">Sluggish</option>
+                        <option value="none" selected disabled>How did it feel?</option>
+                        <option value="energized">Energized</option>
+                        <option value="satisfied">Satisfied</option>
+                        <option value="sluggish">Sluggish</option>
                     </select>
                 </div>
             </div>
             <div class="meal-entry">
-                <label for="dinner" data-i18n-key="dinner">Dinner</label>
+                <label for="dinner">Dinner</label>
                 <div class="meal-input-group">
-                    <input type="text" id="dinner" data-i18n-placeholder="dinnerPlaceholder" aria-label="Dinner food">
+                    <input type="text" id="dinner" placeholder="e.g., Salmon with roasted vegetables" aria-label="Dinner food">
                     <select id="dinner-time" aria-label="Dinner time">
                         <!-- Options populated by script.js -->
                     </select>
                     <select id="dinner-mood" aria-label="How you felt after dinner">
-                        <option value="none" selected disabled data-i18n-key="howDidItFeel">How did it feel?</option>
-                        <option value="energized" data-i18n-key="energized">Energized</option>
-                        <option value="satisfied" data-i18n-key="satisfied">Satisfied</option>
-                        <option value="sluggish" data-i18n-key="sluggish">Sluggish</option>
+                        <option value="none" selected disabled>How did it feel?</option>
+                        <option value="energized">Energized</option>
+                        <option value="satisfied">Satisfied</option>
+                        <option value="sluggish">Sluggish</option>
                     </select>
                 </div>
             </div>
 
             <div class="meal-entry">
-                <label data-i18n-key="snacks">Snacks</label>
+                <label>Snacks</label>
                 <div id="snacks-container" aria-live="polite"></div>
-                <button type="button" id="add-snack-btn" class="button button-secondary" data-i18n-key="addSnack">+ Add Snack</button>
+                <button type="button" id="add-snack-btn" class="button button-secondary">+ Add Snack</button>
             </div>
 
-            <button id="analyze-btn" class="button button-primary" data-i18n-key="analyzeMyDay">Analyze My Day</button>
+            <button id="analyze-btn" class="button button-primary">Analyze My Day</button>
         </div>
         
         <!-- Analysis & Charts Card -->
         <div id="analysis-and-charts" class="card hidden">
             <div id="analysis-output" aria-labelledby="analysis-heading">
-                <h2 id="analysis-heading" data-i18n-key="todaysAnalysis">Today's Analysis</h2>
+                <h2 id="analysis-heading">Today's Analysis</h2>
                 <div id="summary"></div>
-                <h3 data-i18n-key="suggestionsForImprovement">Suggestions for Improvement:</h3>
+                <h3>Suggestions for Improvement:</h3>
                 <ul id="suggestions" aria-live="polite"></ul>
                 <div id="community-tip-container" class="hidden" aria-live="polite">
-                    <h4 data-i18n-key="communityTip">💡 Community Tip</h4>
+                    <h4>💡 Community Tip</h4>
                     <p id="community-tip-text"></p>
                 </div>
             </div>
             <div id="charts-container" role="region" aria-labelledby="charts-heading">
-                <h2 id="charts-heading" data-i18n-key="dataVisualized">Data Visualized</h2>
+                <h2 id="charts-heading">Data Visualized</h2>
                 <canvas id="macro-chart" role="img" aria-label="Pie chart of macronutrients"></canvas>
             </div>
         </div>
 
         <!-- Weekly Summary Card -->
          <div id="weekly-summary-container" class="card hidden" role="region" aria-labelledby="weekly-summary-heading">
-            <h2 id="weekly-summary-heading" data-i18n-key="yourWeekAtAGlance">Your Week at a Glance</h2>
+            <h2 id="weekly-summary-heading">Your Week at a Glance</h2>
             <div id="weekly-summary" class="summary-grid" aria-live="polite"></div>
         </div>
 
         <!-- Plans & Quests Card -->
         <div class="card">
             <div id="routine-generator" aria-labelledby="routine-generator-heading">
-                <h2 id="routine-generator-heading" data-i18n-key="workoutRoutine">Workout Routine</h2>
-                <button id="generate-routine-btn" class="button button-secondary" data-i18n-key="generateMuscleBuildingRoutine">Generate Muscle-Building Routine</button>
+                <h2 id="routine-generator-heading">Workout Routine</h2>
+                <button id="generate-routine-btn" class="button button-secondary">Generate Muscle-Building Routine</button>
                 <div id="routine-output" class="hidden" aria-live="polite"></div>
             </div>
              <hr style="border: 1px solid var(--border-color); margin: 2rem 0;">
             <div id="meal-plan-container" role="region" aria-labelledby="meal-plan-heading">
-                <h2 id="meal-plan-heading" data-i18n-key="mealPlanGenerator">Meal Plan Generator</h2>
-                <button id="generate-plan-btn" class="button button-secondary" data-i18n-key="generate3DayMealPlan">Generate a 3-Day Meal Plan</button>
+                <h2 id="meal-plan-heading">Meal Plan Generator</h2>
+                <button id="generate-plan-btn" class="button button-secondary">Generate a 3-Day Meal Plan</button>
                 <div id="meal-plan-output" class="hidden" aria-live="polite"></div>
                 <div id="meal-plan-actions" class="hidden">
-                     <button id="export-grocery-btn" class="button button-secondary" data-i18n-key="exportToGroceryList">Export to Grocery List</button>
-                     <button id="find-meal-kits-btn" class="button button-secondary" data-i18n-key="findMealKits">Find Meal Kits</button>
+                     <button id="export-grocery-btn" class="button button-secondary">Export to Grocery List</button>
+                     <button id="find-meal-kits-btn" class="button button-secondary">Find Meal Kits</button>
                 </div>
             </div>
             <hr style="border: 1px solid var(--border-color); margin: 2rem 0;">
             <div id="quests-container" role="region" aria-labelledby="quests-heading">
-                <h2 id="quests-heading" data-i18n-key="wellnessQuests">Wellness Quests</h2>
+                <h2 id="quests-heading">Wellness Quests</h2>
                 <div id="quests-output" aria-live="polite"></div>
             </div>
         </div>
@@ -139,12 +134,12 @@
         <!-- History Card -->
         <div id="history-container" class="card" role="region" aria-labelledby="history-heading">
             <h2 id="history-heading">
-                <span data-i18n-key="mealHistory">Meal History</span>
+                <span>Meal History</span>
                 <div class="history-controls">
-                    <label for="import-file" class="button button-secondary" data-i18n-key="import">Import</label>
+                    <label for="import-file" class="button button-secondary">Import</label>
                     <input type="file" id="import-file" accept=".json" class="sr-only" aria-label="Import meal history from a JSON file">
-                    <button id="export-btn" class="button button-secondary" data-i18n-key="export">Export</button>
-                    <button id="clear-history-btn" class="button button-danger" data-i18n-key="clearAll">Clear All</button>
+                    <button id="export-btn" class="button button-secondary">Export</button>
+                    <button id="clear-history-btn" class="button button-danger">Clear All</button>
                 </div>
             </h2>
             <ul id="history-list" aria-live="polite"></ul>
@@ -154,8 +149,7 @@
 
     <!-- Chart.js Library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- i18n Script -->
-    <script src="i18n.js"></script>
+
     <!-- Main App Script -->
     <script src="script.js?v=2.1"></script> 
 </body>
